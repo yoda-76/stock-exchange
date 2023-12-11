@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-
+import "../App.css"
 const Login = () => {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
@@ -58,35 +58,40 @@ const Login = () => {
   };
 
   return (
-    <div className="form_container">
-      <h2>Login Account</h2>
+    <div className="flex login flex-col border justify-center items-center lg:items-end lg:pr-80 h-screen w-screen">
+     <div className="border-4 bg-white bg-opacity-10 text-white border-white rounded-lg p-20"> <h2 className="text-5xl font-semibold">Login Account</h2>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
+        <div className="mt-10">
+          <label className="p-4 m-[18px] text-xl" htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
             value={email}
-            placeholder="Enter your email"
+            className="bg-transparent h-10 border-2 rounded-xl"
+            placeholder="    Enter your email"
             onChange={handleOnChange}
           />
         </div>
-        <div>
-          <label htmlFor="password">Password</label>
+        <div className="mt-4">
+          <label className="p-4 text-xl" htmlFor="password">Password</label>
           <input
             type="password"
             name="password"
             value={password}
-            placeholder="Enter your password"
+            className="bg-transparent h-10 border-2 rounded-xl"
+            placeholder="    Enter your password"
             onChange={handleOnChange}
           />
         </div>
-        <button type="submit">Submit</button>
-        <span>
+<div className="flex mt-6 mb-6 border h-10 hover:bg-blue-500 justify-center">
+<button type="submit" className="">Submit</button>
+
+</div>
+        <div>
           Already have an account? <Link to={"/signup"}>Signup</Link>
-        </span>
+        </div>
       </form>
-      <ToastContainer />
+      <ToastContainer /></div>
     </div>
   );
 };
