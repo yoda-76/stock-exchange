@@ -37,4 +37,4 @@ app.use(express.json());
 
 app.use("/", authRoute);
 app.use("/profile", profile);
-app.use("/console",console)
+// app.use("/console",console)
