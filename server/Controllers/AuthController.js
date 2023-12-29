@@ -49,3 +49,12 @@ module.exports.Login = async (req, res, next) => {
       console.error(error);
     }
   }
+
+  module.exports.changePassword = async (req, res, next) => {
+    try {
+      //code for changing password
+      // next()
+    } catch (error) {
+      console.error(error);
+    }
+  }

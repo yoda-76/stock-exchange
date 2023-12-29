@@ -1,4 +1,4 @@
-//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=bcc797ea-e9be-42f9-9f59-773126ab3652&redirect_uri=http://localhost:4000/auth
+//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=test1@gmail.com
 
 const User = require("../Models/UserModel");
 const axios=require("axios")
@@ -14,7 +14,7 @@ module.exports.GetAccessToken = async (req, res, next) => {
     if(!user){
     return res.json({message:'Incorrect email' }) 
     }
-    console.log(user)
+    // console.log(user)
     axios.post('https://api.upstox.com/v2/login/authorization/token', null, {
         headers: {
             'Accept': 'application/json',
@@ -32,14 +32,14 @@ module.exports.GetAccessToken = async (req, res, next) => {
     .then(async response => {
         console.log("Data: ",response.data);
         const resp=await User.findOneAndUpdate({ email }, { $set: { data:response.data } });
-        if (resp) {
+        if (resp) { 
           console.log("Original Doc: ", resp);
         } else {
           return res.status(501).json({ message: "error in saving accesstoken in db" });
         }
     })
     .catch(error => {
-        console.log(error);
+        console.log("error");
         res.status(500).send('Error obtaining authorization token');
     }); 
     next();
