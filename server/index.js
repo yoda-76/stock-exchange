@@ -7,6 +7,7 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const authRoute = require("./Routes/AuthRoute");
 const profile = require("./Routes/profile");
+const tradingConsole= require("./Routes/tradingConsole")
 
 const { MONGO_URL, PORT } = process.env;
 
@@ -37,4 +38,4 @@ app.use(express.json());
 
 app.use("/", authRoute);
 app.use("/profile", profile);
-app.use("/console",console)
+app.use("/console",tradingConsole)

@@ -1,85 +1,31 @@
-const express = require("express");
-// const mongoose = require("mongoose");
-// const cors = require("cors");
-const app = express();
-require("dotenv").config();
-// const cookieParser = require("cookie-parser"); 
-// const authRoute = require("./Routes/AuthRoute");
-const {  PORT } = process.env;
+const at="eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiI0SkJIM1AiLCJqdGkiOiI2NThjYjg5ODJlMTJkMDM1NDIyN2QzYmIiLCJpc011bHRpQ2xpZW50IjpmYWxzZSwiaXNBY3RpdmUiOnRydWUsInNjb3BlIjpbImludGVyYWN0aXZlIiwiaGlzdG9yaWNhbCJdLCJpYXQiOjE3MDM3MjExMTIsImlzcyI6InVkYXBpLWdhdGV3YXktc2VydmljZSIsImV4cCI6MTcwMzgwMDgwMH0.Sg1W_oZ-6UQxm21LUBkjnRYFUlOTZl6LXm6V275XP0g"
 
-// mongoose
-//   .connect(MONGO_URL, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   })
-//   .then(() => console.log("MongoDB is  connected successfully"))
-//   .catch((err) => console.error(err));
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
-});
+const axios = require('axios');
 
-// app.use(
-//   cors({
-//     origin: ["http://localhost:3000"],
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//     credentials: true,
-//   })
-// );
-// app.use(cookieParser());
-
-app.use(express.json());
-
-// app.use("/", authRoute);
-
-const passport= require("passport")
-const OAuth2Strategy=require("passport-oauth2")
-const key="bcc797ea-e9be-42f9-9f59-773126ab3652"
-const secret="kab47d1kfj"
-// const code="zZFWsH"
-passport.use(new OAuth2Strategy({
-    authorizationURL: `https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=${key}&redirect_uri=http://localhost:4000/auth`,
-    
-    clientID: key,
-    clientSecret: secret,
-    tokenURL: `https://api.upstox.com/v2/login/authorization/token`,
-    callbackURL: "http://localhost:4000/auth/callback"
+let config = {
+  method: 'get',
+  maxBodyLength: Infinity,
+  url: 'https://api.upstox.com/v2/charges/brokerage',
+  headers: { 
+    'Accept': 'application/json',
+    'Api-Version': '2.0',
+    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiI0SkJIM1AiLCJqdGkiOiI2NThjYjg5ODJlMTJkMDM1NDIyN2QzYmIiLCJpc011bHRpQ2xpZW50IjpmYWxzZSwiaXNBY3RpdmUiOnRydWUsInNjb3BlIjpbImludGVyYWN0aXZlIiwiaGlzdG9yaWNhbCJdLCJpYXQiOjE3MDM3MjExMTIsImlzcyI6InVkYXBpLWdhdGV3YXktc2VydmljZSIsImV4cCI6MTcwMzgwMDgwMH0.Sg1W_oZ-6UQxm21LUBkjnRYFUlOTZl6LXm6V275XP0g',
+    'Content-Type': 'application/x-www-form-urlencoded'
   },
-  function(accessToken, refreshToken, profile, cb) {
-    console.log("Access Token => ", accessToken)
+  params:{
+    "instrument_token":"NSE_FO|35047",
+    "price":"3.70",
+    "transaction_type":"BUY",
+    "product":"I",
+    "quantity":"15"
   }
-));
+};
 
-app.get('/auth/',
-  passport.authenticate('oauth2'));
-
-app.get('/auth/callback',
-  passport.authenticate('oauth2', { failureRedirect: ()=>{console.log("first")} }),
-
-  function(req, res) {
-    // Successful authentication, redirect home.
-    console.log("authenticated",req.body)
-    res.redirect('/');
+axios(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    console.log(error);
   });
-
-// app.get("/auth",(req,res)=>{
-//     const authCode = req.query.code;
-
-//     // Make a POST request to obtain the authorization token
-//     axios.post('https://api.upstox.com/v2/login/authorization/token', {
-//       code: authCode,
-//       client_id: key,
-//       client_secret: secret,
-//       redirect_uri: 'http://localhost:4000/auth',
-//       grant_type: authCode
-//     })
-//     .then(response => {
-//       // Handle the response from the token endpoint
-//       console.log("data",response.data);
-//       res.send(response.data); // You can customize the response as needed
-//     })
-//     .catch(error => {
-//       console.error(error);
-//       res.status(500).send('Error obtaining authorization token');
-//     });
-//   });
