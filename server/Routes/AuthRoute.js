@@ -11,5 +11,9 @@ router.get("/auth",GetAccessToken, (req, res) => {
       user: req.user
     });
   })
+router.get("/test", (req,res)=>{
+console.log("first")
+res.send("ok ok ok ok")
+})
 
 module.exports = router

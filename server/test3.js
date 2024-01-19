@@ -28,7 +28,7 @@ const User = require("./Models/UserModel");
 // const t=async ()=>await User.findOne({email:"test1@gmail.com"})
 // const user=t()
 // const accessToken=user.data.access_token;
-const accessToken="eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiI0SkJIM1AiLCJqdGkiOiI2NThkZjcwYjQ2ZmQ0OTU0ODc4NWM2ODQiLCJpc011bHRpQ2xpZW50IjpmYWxzZSwiaXNBY3RpdmUiOnRydWUsInNjb3BlIjpbImludGVyYWN0aXZlIiwiaGlzdG9yaWNhbCJdLCJpYXQiOjE3MDM4MDI2MzUsImlzcyI6InVkYXBpLWdhdGV3YXktc2VydmljZSIsImV4cCI6MTcwMzg4NzIwMH0.CtR8Hki1zbpvj8PGDgjaCLtDcM3J92DNugYy_mPddhk"
+const accessToken="eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiI0SkJIM1AiLCJqdGkiOiI2NWFhYzUzYzQxZDI2ZDE2MTE2OTM4NTUiLCJpc011bHRpQ2xpZW50IjpmYWxzZSwiaXNBY3RpdmUiOnRydWUsInNjb3BlIjpbImludGVyYWN0aXZlIiwiaGlzdG9yaWNhbCJdLCJpYXQiOjE3MDU2OTA0MjgsImlzcyI6InVkYXBpLWdhdGV3YXktc2VydmljZSIsImV4cCI6MTcwNTcwMTYwMH0.Hl2d41QO-fM0c-ntG4_QT7k54OolFfB0X1KoYGel1Q8"
 // Initialize global variables
 let protobufRoot = null;
 let defaultClient = UpstoxClient.ApiClient.instance;
@@ -88,6 +88,7 @@ const connectWebSocket = async (wsUrl) => {
 
     ws.on("message", (data) => {
       console.log(JSON.stringify(decodeProfobuf(data))); // Decode the protobuf message on receiving it
+      console.log("data")
     });
 
     ws.on("error", (error) => {
