@@ -31,7 +31,7 @@ const Signup = () => {
     const handleSubmit = async (e) => {
       e.preventDefault();
       try {
-        const response = await fetch("http://localhost:4000/signup", {
+        const response = await fetch("http://localhost:4000/profile/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const Signup = () => {
         if (success) {
           handleSuccess(message);
           setTimeout(() => {
-            navigate("/");
+            navigate("/userDetails");
           }, 1000);
         } else {
           handleError(message);
@@ -101,7 +101,7 @@ const Signup = () => {
             onChange={handleOnChange}
           />
         </div>
-<div className="flex mt-6 mb-6 border h-10 hover:bg-blue-500 justify-center">
+<div className="flex mt-6 mb-6 border h-10 hover:bg-blue-500 justify-center" onClick={handleSubmit}>
         <button type="submit">Submit</button>
         </div>
           <div>

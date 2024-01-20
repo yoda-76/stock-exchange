@@ -31,7 +31,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:4000/login",
+        "http://localhost:4000/profile/login",
         {
           ...inputValue,
         },
@@ -40,9 +40,11 @@ const Login = () => {
       console.log(data);
       const { success, message } = data;
       if (success) {
+        console.log(inputValue.email);
+        window.localStorage.setItem("email",inputValue.email)
         handleSuccess(message);
         setTimeout(() => {
-          navigate("/");
+          navigate("/profile");
         }, 1000);
       } else {
         handleError(message);
@@ -83,7 +85,7 @@ const Login = () => {
             onChange={handleOnChange}
           />
         </div>
-<div className="flex mt-6 mb-6 border h-10 hover:bg-blue-500 justify-center">
+<div className="flex mt-6 mb-6 border h-10 hover:bg-blue-500 justify-center" onClick={handleSubmit}>
 <button type="submit" className="">Submit</button>
 
 </div>
@@ -91,7 +93,8 @@ const Login = () => {
           Already have an account? <Link to={"/signup"}>Signup</Link>
         </div>
       </form>
-      <ToastContainer /></div>
+      <ToastContainer />
+      </div>
     </div>
   );
 };
