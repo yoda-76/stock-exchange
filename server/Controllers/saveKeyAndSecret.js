@@ -1,32 +1,13 @@
 const User = require("../Models/UserModel");
 const { createSecretToken } = require("../util/SecretToken");
 
-module.exports.saveKeyAndSecret = async (req, res, next) => {
-  try {
-    const { email, key, secret } = req.body;
+module.exports.saveKeyAndSecret = async (email, key, secret) => {
     const user = await User.findOneAndUpdate({ email }, { $set: { key, secret } });
-
-
     if (user) {
-      console.log("Original Doc: ", user);
-      req.user = user; // Store the user in the request object for the next middleware
-      next(); // Pass control to the next middleware
+      return user
     } else {
-      console.log("error");
-      return res.status(501).json({ message: "error in mongoose findOneAndUpdate" });
+      return
     }
-
-    // If you have further logic that should be executed after updating the user, you can place it here
-
-    // res.status(201).json({
-    //   message: "User data saved successfully",
-    //   success: true,
-    //   user,
-    // });
-  } catch (error) {
-    console.log("error =>>", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
 };
 
 

@@ -44,7 +44,7 @@ const Login = () => {
         window.localStorage.setItem("email",inputValue.email)
         handleSuccess(message);
         setTimeout(() => {
-          navigate("/profile");
+          navigate("/home");
         }, 1000);
       } else {
         handleError(message);

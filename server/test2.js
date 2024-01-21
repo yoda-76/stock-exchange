@@ -8,7 +8,8 @@ const csvtojson = require('csvtojson');
 const url = 'https://assets.upstox.com/market-quote/instruments/exchange/complete.csv.gz';
 
 // Create the 'token_data' folder if it doesn't exist
-const folderPath = path.join(__dirname, 'token_data');
+const parentDirectory = path.resolve(__dirname, '..');
+const folderPath = path.join(parentDirectory, 'token_data');
 if (!fs.existsSync(folderPath)) {
   fs.mkdirSync(folderPath);
 }
