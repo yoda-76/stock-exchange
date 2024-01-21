@@ -4,9 +4,7 @@ const http = require("http"); // Add the http module
 const server = http.createServer(app); // Create an HTTP server
 const mongoose = require("mongoose");
 const cors = require("cors");
-const WebSocket = require("ws"); // Require the WebSocket library
 const cookieParser = require("cookie-parser");
-const User = require("./Models/UserModel");
 const authRoute = require("./Routes/AuthRoute");
 const profile = require("./Routes/profile");
 const tradingConsole = require("./Routes/tradingConsole");
@@ -14,6 +12,39 @@ require("dotenv").config();
 
 const { MONGO_URL, PORT } = process.env; 
 
+mongoose
+.connect(MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB is connected successfully"))
+  .catch((err) => console.error(err));
+  
+  app.use(
+    cors({
+      origin: ["http://localhost:3000"],
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+  );
+  
+  app.use(cookieParser());
+  app.use(express.json());
+  
+app.use("/", authRoute);
+app.use("/profile", profile);
+app.use("/console", tradingConsole);
+
+
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
+
+
+//.................................................................................
+
+
+const WebSocket = require("ws"); // Require the WebSocket library
 const socketio = require('socket.io');
 const io = socketio(server, {
   cors: {
@@ -21,6 +52,7 @@ const io = socketio(server, {
     methods: ["GET", "POST"],
   },
 });
+const User = require("./Models/UserModel");
 
 io.on('connection', async (socket) => {
   const user=await User.findOne({email:socket.handshake.query.email})
@@ -162,34 +194,4 @@ io.on('connection', async (socket) => {
   socket.on('disconnect', () => {
     console.log(`Socket ${socket.id} disconnected`);
   });
-});
-
- 
-
-mongoose
-  .connect(MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB is connected successfully"))
-  .catch((err) => console.error(err));
-
-app.use(
-  cors({
-    origin: ["http://localhost:3000"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-
-app.use(cookieParser());
-app.use(express.json());
-
-app.use("/", authRoute);
-app.use("/profile", profile);
-app.use("/console", tradingConsole);
-
-
-server.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
 });

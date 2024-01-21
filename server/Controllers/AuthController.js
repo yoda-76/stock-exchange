@@ -2,52 +2,37 @@ const User = require("../Models/UserModel");
 const { createSecretToken } = require("../util/SecretToken");
 const bcrypt = require("bcryptjs");
 
-module.exports.Signup = async (req, res, next) => {
-  try {
-    const { email, password, username, createdAt } = req.body;
+module.exports.Signup = async (email, password, username, createdAt) => {
+    console.log("first")
     const existingUser = await User.findOne({ email });
+    console.log("first")
+
     if (existingUser) {
-      return res.json({ message: "User already exists" });
+    console.log("existingUser",existingUser)
+      return ;
     }
     const user = await User.create({ email, password, username, createdAt });
+    // console.log("new user",user)
+
     const token = createSecretToken(user._id);
-    res.cookie("token", token, {
-      withCredentials: true,
-      httpOnly: false,
-    });
-    res
-      .status(201)
-      .json({ message: "User signed in successfully", success: true, user });
-    next();
-  } catch (error) {
-    console.log("error =>>",error);
-  }
+    // console.log("token", token)
+    return token
 };
 
-module.exports.Login = async (req, res, next) => {
-    try {
-      const { email, password } = req.body;
+module.exports.Login = async (email, password) => {
       if(!email || !password ){
         return res.json({message:'All fields are required'})
       }
       const user = await User.findOne({ email });
       if(!user){
-        return res.json({message:'Incorrect password or email' }) 
+        return  
       }
       const auth = await bcrypt.compare(password,user.password)
       if (!auth) {
-        return res.json({message:'Incorrect password or email' }) 
+        return 
       }
        const token = createSecretToken(user._id);
-       res.cookie("token", token, {
-         withCredentials: true,
-         httpOnly: false,
-       });
-       res.status(201).json({ message: "User logged in successfully", success: true });
-       next()
-    } catch (error) {
-      console.error(error);
-    }
+       return token
   }
 
   module.exports.changePassword = async (req, res, next) => {

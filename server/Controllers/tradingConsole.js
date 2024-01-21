@@ -1,9 +1,8 @@
 const axios = require('axios');
 const User = require("../Models/UserModel");
 
-module.exports.getBrokrage = async (req, res, next) => {
-  try {
-    const {email, instrumentToken, quantity, product, transactionType, price}=req.body
+module.exports.getBrokrage = async (email, instrumentToken, quantity, product, transactionType, price) => {
+
 
     const user=await User.findOne({email})
     const accessToken=user.data.access_token;
@@ -27,57 +26,33 @@ module.exports.getBrokrage = async (req, res, next) => {
       }
     };
 
-    axios(config)
-      .then((response) => {
-        const brokerageData=response.data
-        console.log(JSON.stringify(brokerageData));
-        res.status(200).json(brokerageData)
-
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-
-    } catch (error) {
-    console.log("error =>>", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+    const response=await axios(config)
+    const brokerageData=response.data
+    return brokerageData;
 };
 
 
     
-module.exports.getFunds = async (req, res, next) => {
-  try {
-    //get funds data and send it back to client
-    const {email}=req.body
-    const user=await User.findOne({email})
-    const accessToken=user.data.access_token;
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: 'https://api.upstox.com/v2/user/get-funds-and-margin',
-      headers: { 
-        'Accept': 'application/json',
-        'Api-Version': '2.0',
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    };
+module.exports.getFunds = async (email) => {
+    
+  const user=await User.findOne({email})
+  const accessToken=user.data.access_token;
 
-    axios(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-      res.status(200).json(response.data)
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: 'https://api.upstox.com/v2/user/get-funds-and-margin',
+    headers: { 
+      'Accept': 'application/json',
+      'Api-Version': '2.0',
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
 
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    } catch (error) {
-    console.log("error =>>", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  const response=await axios(config)
+  const funds=response.data
+  return funds;
 };
 
 
@@ -85,10 +60,8 @@ module.exports.getFunds = async (req, res, next) => {
 
 
 
-module.exports.getPositions = async (req, res, next) => {
-  try {
-    //get funds data and send it back to client
-    const {email}=req.body
+module.exports.getPositions = async (email) => {
+  
     const user=await User.findOne({email})
     const accessToken=user.data.access_token;
     let config = {
@@ -102,21 +75,51 @@ module.exports.getPositions = async (req, res, next) => {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     };
-    axios(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-      res.status(200).json(response.data)
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    } catch (error) {
-    console.log("error =>>", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+    const response=await axios(config)
+    const positions=response.data
+    return positions;
 };
 
 
+module.exports.getOrderbook=async(email)=>{
+  const user=await User.findOne({email})
+  const accessToken=user.data.access_token;
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: 'https://api.upstox.com/v2/portfolio/short-term-positions',
+    headers: { 
+      'Accept': 'application/json',
+      'Api-Version': '2.0',
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+  const response=await axios(config)
+  const positions=response.data
+  let orderbook=positions//...get orderbook from positions
+  return orderbook
+}
+
+module.exports.getTradebook=async(email)=>{
+  const user=await User.findOne({email})
+  const accessToken=user.data.access_token;
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: 'https://api.upstox.com/v2/portfolio/short-term-positions',
+    headers: { 
+      'Accept': 'application/json',
+      'Api-Version': '2.0',
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+  const response=await axios(config)
+  const positions=response.data
+  let tradebook=positions//...get tradebook from positions
+  return tradebook
+}
 
 module.exports.placeOrder = async (req, res, next) => {
   try {
@@ -218,5 +221,7 @@ module.exports.stoploss = async (req, res, next) => {
   }
 };
 
+
+//also add get profile method
 
 
