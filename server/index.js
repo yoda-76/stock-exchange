@@ -8,10 +8,7 @@ const cookieParser = require("cookie-parser");
 const authRoute = require("./Routes/AuthRoute");
 const profile = require("./Routes/profile");
 const tradingConsole= require("./Routes/tradingConsole")
-
 const { MONGO_URL, PORT } = process.env;
-
-
 
 mongoose
   .connect(MONGO_URL, {
@@ -27,7 +24,7 @@ app.listen(PORT, () => {
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
