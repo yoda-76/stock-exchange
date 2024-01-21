@@ -1,50 +1,37 @@
-//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=test1@gmail.com
-
+//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=test10@gmail.com
+ 
 const User = require("../Models/UserModel");
 const axios=require("axios")
 
 
-module.exports.GetAccessToken = async (req, res, next) => {
-  try {
-    console.log(req.query)
-    const authcode=req.query.code;
-    const email=req.query.state
-    console.log(email,authcode)
-    const user = await User.findOne({ email });
-    if(!user){
-    return res.json({message:'Incorrect email' }) 
-    }
-    // console.log(user)
-    axios.post('https://api.upstox.com/v2/login/authorization/token', null, {
-        headers: {
-            'Accept': 'application/json',
-            'Api-Version': '2.0',
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        params: {
-            code: authcode,
-            client_id: user.key,
-            client_secret: user.secret,
-            redirect_uri: 'http://localhost:4000/auth',
-            grant_type: 'authorization_code',
-        },
-    })
-    .then(async response => {
-        console.log("Data: ",response.data);
-        const resp=await User.findOneAndUpdate({ email }, { $set: { data:response.data } });
-        if (resp) { 
-          console.log("Original Doc: ", resp);
-        } else {
-          return res.status(501).json({ message: "error in saving accesstoken in db" });
-        }
-    })
-    .catch(error => {
-        console.log("error");
-        res.status(500).send('Error obtaining authorization token');
-    }); 
-    next();
-  } catch (error) {
-    console.log("error =>>",error);
+module.exports.GetAccessToken = async (email,authcode) => {
+  console.log(email,authcode)
+  const user = await User.findOne({ email });
+  if(!user){
+  return 
+  }
+  console.log("first log :\n",user)
+  const response=await axios.post('https://api.upstox.com/v2/login/authorization/token', null, {
+      headers: {
+          'Accept': 'application/json',
+          'Api-Version': '2.0',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      params: {
+          code: authcode,
+          client_id: user.key,
+          client_secret: user.secret,
+          redirect_uri: 'http://localhost:4000/auth',
+          grant_type: 'authorization_code',
+      },
+  })
+  console.log("Data: ",response.data);
+  const resp=await User.findOneAndUpdate({ email }, { $set: { data:response.data } });
+  if (resp) { 
+    console.log("Original Doc: ", resp);
+    return resp
+  } else {
+    return 
   }
 };
 

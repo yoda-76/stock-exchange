@@ -39,8 +39,8 @@ router.post('/login', async(req,res,next)=>{
       httpOnly: false,
     });
     res
-      .status(201)
-      .json({ message: "User signup successfully" });
+      .status(200)
+      .json({success:"ok", message: "User login successfully" });
     }else{
       return res.json({message:'Incorrect password or email' })
     }

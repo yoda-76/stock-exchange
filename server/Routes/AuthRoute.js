@@ -4,16 +4,15 @@ const router = require('express').Router()
 
 // router.post('/',userVerification)
 
-router.get("/auth",GetAccessToken, (req, res) => {
-    res.status(201).json({
+router.get("/auth", async(req, res) => {
+  const authcode=req.query.code;
+  const email=req.query.state
+    const user=await GetAccessToken(email,authcode)
+    if(user){
+      console.log("data added")
+      res.status(201).json({
       message: "Access token saved successfully",
       success: true,
-      user: req.user
-    });
+    });}
   })
-router.get("/test", (req,res)=>{
-console.log("first")
-res.send("ok ok ok ok")
-})
-
 module.exports = router
