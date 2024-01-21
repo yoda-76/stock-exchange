@@ -102,7 +102,6 @@ const TradeDashboard = () => {
     tradebookRef.current = tradebook;
     fetchedPositionsRef.current = fetchedPositions;
   }, [orderBook, tradebook, fetchedPositions]);
-  const [accountName, setAccountName] = useState("");
   const [customBuyCallKey, setCustomBuyCallKey] = useState(
     localStorage.getItem("customBuyCallKey") || ""
   );
@@ -264,7 +263,6 @@ const TradeDashboard = () => {
         setTradebook(data.tradebook);
         setFetchedPositions(data.positions);
         setAtm(data.atm);
-        setAccountName(data.accountName);
         if (data.uniqueExpiryDates && data.uniqueExpiryDates.length > 0) {
           console.log(data.uniqueExpiryDates);
           setExpiryList(
@@ -305,55 +303,6 @@ const TradeDashboard = () => {
     console.log(callSymbol);
     console.log(putSymbol);
   }, [selectedOption1, callStrike, putStrike, expiry]);
-
-
-
-
-
-
-
-
-// const connectWebSocket = () => {
-//     const serverUrl = 'http://localhost:4000?email=test1@gmail.com'; // Replace with your server URL
-
-//     const ws = io(serverUrl);
-//     setSocket(ws);
-
-//     ws.on('connect', () => {
-//       console.log(Connected to Socket.IO server with id ${ws.id});
-//     });
-
-//     ws.on('message', (message) => {
-//       console.log('Received message from Socket.IO server:', message);
-//       setMessage(message);
-//     });
-
-//     ws.on('disconnect', () => {
-//       console.log('Disconnected from Socket.IO server');
-//     });
-
-//     ws.on('error', (error) => {
-//       console.error('Socket.IO error:', error);
-//     });
-
-//     // Close the WebSocket connection when the component is unmounted
-//     return () => {
-//       if (ws) {
-//         ws.close();
-//       }
-//     };
-//   };
-
-
-
-
-
-
-
-
-
-
-
 console.log(`${API_URL}?email=${Email}`)
   useEffect(() => {
 console.log(`${API_URL}?email=${Email}`)
@@ -563,48 +512,6 @@ console.log(`${API_URL}?email=${Email}`)
     };
   }, []);
 
-  const handlePositionClick = () => {
-    setPositionButtonClicked(true);
-    setOrderBookButtonClicked(false);
-    setTradeBookButtonClicked(false);
-    setFundsButtonClicked(false);
-    setPositions(true);
-    setOrderBook(false);
-    setTradeBook(false);
-    setFunds(false);
-  };
-
-  const handleOrderBookClick = () => {
-    setOrderBookButtonClicked(true);
-    setTradeBookButtonClicked(false);
-    setPositionButtonClicked(false);
-    setFundsButtonClicked(false);
-    setOrderBook(true);
-    setTradeBook(false);
-    setPositions(false);
-    setFunds(false);
-  };
-
-  const handleTradeBookClick = () => {
-    setTradeBookButtonClicked(true);
-    setOrderBookButtonClicked(false);
-    setPositionButtonClicked(false);
-    setFundsButtonClicked(false);
-    setTradeBook(true);
-    setOrderBook(false);
-    setPositions(false);
-    setFunds(false);
-  };
-  const handleFundsClick = () => {
-    setTradeBookButtonClicked(false);
-    setOrderBookButtonClicked(false);
-    setPositionButtonClicked(false);
-    setFundsButtonClicked(true);
-    setTradeBook(false);
-    setOrderBook(false);
-    setPositions(false);
-    setFunds(true);
-  };
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (enableClick) {
