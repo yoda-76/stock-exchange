@@ -17,7 +17,7 @@ const { MONGO_URL, PORT } = process.env;
 const socketio = require('socket.io');
 const io = socketio(server, {
   cors: {
-    origin: "http://localhost:3000",  // Adjust the origin to match your React app's URL
+    origin: "http://localhost:5173",  // Adjust the origin to match your React app's URL
     methods: ["GET", "POST"],
   },
 });
@@ -107,8 +107,8 @@ io.on('connection', async (socket) => {
       });
 
       ws.on("message", (data) => {
-        console.log(JSON.stringify(decodeProfobuf(data))); // Decode the protobuf message on receiving it
-        console.log("data")
+        // console.log(JSON.stringify(decodeProfobuf(data))); // Decode the protobuf message on receiving it
+        // console.log("data")
         io.emit('message',JSON.stringify(decodeProfobuf(data)))
       });
 
