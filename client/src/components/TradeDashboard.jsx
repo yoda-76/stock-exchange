@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import io from 'socket.io-client';
 import Dropdown from "./basic components/Dropdown";
 import WatchList from "./watchList";
 import Orderbook from "./tradeDashboard/Orderbook";
@@ -92,7 +93,7 @@ const TradeDashboard = () => {
     putTokenRef.current = putToken;
     console.log(callSymbolRef.current);
   }, [callToken, putToken]);
-
+  const Email =  window.localStorage.getItem("email");
   const orderbookRef = useRef(orderbook);
   const tradebookRef = useRef(tradebook);
   const fetchedPositionsRef = useRef(fetchedPositions);
@@ -305,10 +306,62 @@ const TradeDashboard = () => {
     console.log(putSymbol);
   }, [selectedOption1, callStrike, putStrike, expiry]);
 
-  useEffect(() => {
-    const socket = new WebSocket(`${SOCKET_API_URL}/instruments`);
 
-    socket.onopen = () => {
+
+
+
+
+
+
+// const connectWebSocket = () => {
+//     const serverUrl = 'http://localhost:4000?email=test1@gmail.com'; // Replace with your server URL
+
+//     const ws = io(serverUrl);
+//     setSocket(ws);
+
+//     ws.on('connect', () => {
+//       console.log(Connected to Socket.IO server with id ${ws.id});
+//     });
+
+//     ws.on('message', (message) => {
+//       console.log('Received message from Socket.IO server:', message);
+//       setMessage(message);
+//     });
+
+//     ws.on('disconnect', () => {
+//       console.log('Disconnected from Socket.IO server');
+//     });
+
+//     ws.on('error', (error) => {
+//       console.error('Socket.IO error:', error);
+//     });
+
+//     // Close the WebSocket connection when the component is unmounted
+//     return () => {
+//       if (ws) {
+//         ws.close();
+//       }
+//     };
+//   };
+
+
+
+
+
+
+
+
+
+
+
+console.log(`${API_URL}?email=${Email}`)
+  useEffect(() => {
+console.log(`${API_URL}?email=${Email}`)
+
+    const serverUrl =`${API_URL}?email=${Email}`;
+    const socket = io(serverUrl);
+    // setSocket(ws);
+    socket.on('connect',() => {
       console.log("WebSocket connected test");
       console.log("array of token", arrayOfTokens);
       const initialData = {
@@ -316,24 +369,29 @@ const TradeDashboard = () => {
         instrumentToken: arrayOfTokens,
       };
       console.log(initialData, "initialdata");
-      socket.send(JSON.stringify(initialData));
-    };
-
-    socket.onmessage = (event) => {
-      const ticks = JSON.parse(event.data);
-
-      console.log(ticks, "ticks");
+      // socket.send(JSON.stringify(initialData));
+    });
+    socket.on('message',(message) => {
+      // console.log(message)
+      const ticker = JSON.parse(message);
+      const ticks = Object.entries (ticker.feeds)
+      // console.log(ticks, "ticks");
       ticks.forEach((tick) => {
-        if (tick.instrument_token == "256265") {
+        // console.log(tick[1].ff.marketFF.ltpc.ltp)
+        const insToken = tick[0].split('|')[1]
+        // console.log(insToken)
+        if (insToken == "38936") {
           console.log(tick);
         }
       });
       setArrayOfToken((prevArrayOfTokens) => {
         const watchList = [...prevArrayOfTokens];
         ticks.forEach((tick) => {
+        const insToken = tick[0].split('|')[1]
           fetchedPositionsRef.current &&
             fetchedPositionsRef.current.day.map((p) => {
-              const currentToken = p.instrument_token;
+              console.log(p)
+              const currentToken = instoken;
               if (
                 Object.prototype.hasOwnProperty.call(
                   trailingStopLossRef.current,
@@ -493,11 +551,11 @@ const TradeDashboard = () => {
         });
         return watchList;
       });
-    };
+    });
 
-    socket.onclose = () => {
+    socket.on('disconnect',() => {
       console.log("WebSocket disconnected");
-    };
+    });
 
     return () => {
       console.log("useEffect has been deprecated");
