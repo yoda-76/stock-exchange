@@ -66,11 +66,41 @@ router.post("/get-orderbook",async(req,res,next)=>{
 })
 
 
-router.post("/place-order",placeOrder)
+router.post("/place-order",async(req,res,next)=>{
+    const {email,quantity, instrument_token}=req.body
+    try{
+        res.status(200).json(
+            {data:await placeOrder(email,quantity, instrument_token)}
+            )
+    }catch(err){
+        console.log(err)
+        res.status(500).send("Internal server error")
+    }
+})
+router.post("/cancel-order",async(req,res,next)=>{
+    const {email,order_id}=req.body
+    try{
+        res.status(200).json(
+            {data:await cancelOrder(email,order_id)}
+            )
+    }catch(err){
+        console.log(err)
+        res.status(500).send("Internal server error")
+    }
+})
+router.post("/cancel-all",async(req,res,next)=>{
+    const {email}=req.body
+    try{
+        res.status(200).json(
+            {data:{cancelOrder:await cancelAll(email)}}
+            )
+    }catch(err){
+        console.log(err)
+        res.status(500).send("Internal server error")
+    }
+})
 router.post("/stoploss",stoploss)
-router.post("/cancel-order",cancelOrder)
 router.post("/exit-position",exitPosition)
-router.post("/cancel-all",cancelAll)
 router.post("/exit-all",exitAll)
 
 //also add get profile method

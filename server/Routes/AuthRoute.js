@@ -10,7 +10,7 @@ router.get("/auth", async(req, res) => {
     const user=await GetAccessToken(email,authcode)
     if(user){
       console.log("data added")
-      res.status(201).json({
+      res.status(201).json({data:user,
       message: "Access token saved successfully",
       success: true,
     });}
