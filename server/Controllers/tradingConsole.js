@@ -37,6 +37,7 @@ module.exports.getFunds = async (email) => {
     
   const user=await User.findOne({email})
   const accessToken=user.data.access_token;
+  console.log(accessToken)
 
   let config = {
     method: 'get',
