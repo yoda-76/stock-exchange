@@ -11,7 +11,7 @@ router.post('/signup', async(req,res,next)=>{
   try{
     const token=await Signup(email, password, username, createdAt)
     if(token){
-      console.log(token)
+      // console.log(token)
       res.cookie("token", token, {
       withCredentials: true,
       httpOnly: false,
@@ -31,16 +31,16 @@ router.post('/signup', async(req,res,next)=>{
 router.post('/login', async(req,res,next)=>{
   const {email, password}=req.body
   try{
-    const token=await Login(email, password)
+    const {token,data}=await Login(email, password)
     if(token){
       console.log(token)
       res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: false,
+      httpOnly: true,
     });
     res
       .status(200)
-      .json({success:"ok", message: "User login successfully" });
+      .json({success:"ok", message: "User login successfully", data });
     }else{
       return res.json({message:'Incorrect password or email' })
     }

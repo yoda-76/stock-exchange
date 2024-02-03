@@ -1,5 +1,4 @@
 const ApiError  = require("../util/api_error.js")
-const api_response = require("../util/api_response.js")
 const User = require("../Models/UserModel");
 const { createSecretToken } = require("../util/SecretToken");
 const bcrypt = require("bcryptjs");
@@ -36,7 +35,20 @@ module.exports.Login = async (email, password) => {
 
       }
        const token = createSecretToken(user._id);
-       return token
+      //  console.log(user)
+       data={keyAndSecretExist:false,isAccessTokenGenerated:false}
+      //  console.log(user.key ,user.secret)
+       if(user.key && user.secret){
+        data.keyAndSecretExist=true
+       }
+       const parsedDate = new Date(user.lastTokenGeneratedAt.split(', ')[0]);
+       const today = new Date();
+       const todayDatePart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+       if(parsedDate.getTime() === todayDatePart.getTime()){
+        data.isAccessTokenGenerated=true
+       }
+      //  console.log(data)
+       return {token,data}
   }
 
   module.exports.changePassword = async (req, res, next) => {
