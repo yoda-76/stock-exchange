@@ -67,10 +67,10 @@ router.post("/get-orderbook",async(req,res,next)=>{
 
 
 router.post("/place-order",async(req,res,next)=>{
-    const {email,quantity, instrument_token}=req.body
+    const {email,quantity, instrument_token,transaction_type}=req.body
     try{
         res.status(200).json(
-            {data:await placeOrder(email,quantity, instrument_token)}
+            await placeOrder(email,quantity, instrument_token,transaction_type)
             )
     }catch(err){
         console.log(err)
@@ -99,7 +99,17 @@ router.post("/cancel-all",async(req,res,next)=>{
         res.status(500).send("Internal server error")
     }
 })
-router.post("/stoploss",stoploss)
+router.post("/stoploss",async(req,res,next)=>{
+    const {email,quantity, instrument_token,transaction_type}=req.body
+    try{
+        res.status(200).json(
+            await stoploss(email, instrument_token,)
+            )
+    }catch(err){
+        console.log(err)
+        res.status(500).send("Internal server error")
+    }
+})
 router.post("/exit-position",exitPosition)
 router.post("/exit-all",exitAll)
 
