@@ -1,4 +1,4 @@
-//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=test1@gmail.com
+//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=dev@gmail.com
  
 const User = require("../Models/UserModel");
 const axios=require("axios")
@@ -7,6 +7,7 @@ const axios=require("axios")
 module.exports.GetAccessToken = async (email,authcode) => {
   console.log(email,authcode)
   const user = await User.findOne({ email });
+  console.log(user)
   if(!user){
   return 
   }
@@ -26,13 +27,13 @@ module.exports.GetAccessToken = async (email,authcode) => {
       },
   })
   console.log("Data: ",response.data);
-  const resp=await User.findOneAndUpdate({ email }, { $set: { data:response.data } });
-  if (resp) { 
-    console.log("Original Doc: ", resp);
-    return resp
-  } else {
-    return 
-  }
+  // const resp=await User.findOneAndUpdate({ email }, { $set: { data:response.data } });
+  // if (resp) { 
+  //   console.log("Original Doc: ", resp);
+  //   return resp
+  // } else {
+  //   return 
+  // }
 };
 
 
