@@ -1,4 +1,6 @@
 import React from 'react'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from '../../dynamicRoutes';
 const placeOrder = (orderType,lotSize,qty,instrument_key) => {
         try {
@@ -29,7 +31,7 @@ const placeOrder = (orderType,lotSize,qty,instrument_key) => {
                   theme: "dark",
                 });
               } else {
-                toast.error(data.data.message, {
+                toast.error(data, {
                   position: "top-right",
                   autoClose: 3000,
                   hideProgressBar: false,
@@ -40,7 +42,7 @@ const placeOrder = (orderType,lotSize,qty,instrument_key) => {
                   theme: "dark",
                 });
               }
-              updatePositions();
+              // updatePositions();
             });
         } catch (err) {
           console.log("request error: " + err);

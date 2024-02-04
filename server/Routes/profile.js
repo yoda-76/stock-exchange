@@ -30,6 +30,7 @@ router.post('/signup', async(req,res,next)=>{
 //change these routes too
 router.post('/login', async(req,res,next)=>{
   const {email, password}=req.body
+  console.log("first")
   try{
     const {token,data}=await Login(email, password)
     console.log(data)

@@ -23,7 +23,7 @@ mongoose
   
   app.use(
     cors({
-      origin: ["http://127.0.0.1:5173"],
+      origin: ["http://localhost:5173","http://127.0.0.1:5173"],
       methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -38,7 +38,7 @@ app.use("/profile", profile);
 app.use("/console", tradingConsole);
 
 
-server.listen(PORT, () => {
+server.listen(PORT,'127.0.0.1', () => {
   console.log(`Server is listening on port ${PORT}`);
 });
 

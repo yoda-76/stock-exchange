@@ -19,6 +19,7 @@ const WatchList = (props) => {
   const [hoveredCEIndex, setHoveredCEIndex] = useState(null);
   const [hoveredPEIndex, setHoveredPEIndex] = useState(null);
  const tradingSymbols = []
+ console.log(data,"watchlist data")
   mainData.map((item, index) =>{
     tradingSymbols.push({ name: item.tradingsymbol, id: index });
   })
@@ -45,9 +46,9 @@ const WatchList = (props) => {
   }, [tokendata, name]);
 
   const token = (selected) => {
-    instruments.forEach((item) => {
-      if (item.tradingsymbol === selected.replace(/\s/g, "")) {
-        setTokendata(item.instrument_token);
+    mainData.forEach((item) => {
+      if (item.tradingsymbol === selected) {
+        setTokendata(item.instrument_key);
         return;
       }
     });
@@ -97,7 +98,7 @@ const WatchList = (props) => {
     <div className="w-full h-full bg-[#1C1C1C] bg-opacity-60 rounded-lg">
       <div>
         <CustomCombobox
-          options={tradingsymbols}
+          options={tradingSymbols}
           atm={props.atm}
           onChange={handleClick}
         />

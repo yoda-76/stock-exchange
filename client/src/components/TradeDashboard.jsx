@@ -293,17 +293,8 @@ console.log(putStrike)
         const insToken = tick[0].split('|')[1]
         // console.log(insToken,callStrike,"values")
 
-        if (tick[0] == "NSE_FO|35012") {
-          console.log(tick,"first tick");
-        }
-        if (tick[0] == "NSE_FO|35013") {
-          console.log(tick,"second tick");
-        }
         // if(string(tick)=== string())
         // console.log(callStrike,data,"strike chec")
-        if(String(callStrike)===String(data.strike)){
-          console.log("found strike")
-        }
         const expiryFilterdData = data.filter(item => item.expiry && item.expiry.includes(`${expiry}`));
         const callInstrumentData = expiryFilterdData.filter(item => 
           item.strike && item.strike.includes(`${callStrike}`) &&
@@ -339,9 +330,10 @@ console.log(putStrike)
 // console.log(insToken,callTokenRef.current,"tokens")
 
           watchList.forEach((item, index) => {
-            console.log(item,"item")
-            if (String(insToken) === String(item.token)) {
-              watchList[index].ltp = tick.last_price;
+            // console.log(item,"item")
+            if (String(tick) === String(item.token)) {
+              console.log(tick[1].ff.marketFF.ltpc.ltp)
+              watchList[index].ltp = tick[1].ff.marketFF.ltpc.ltp;
               watchList[index].pnl = (
                 ((tick.last_price - tick.ohlc.close) / tick.ohlc.close) *
                 100
