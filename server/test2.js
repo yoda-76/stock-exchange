@@ -18,6 +18,8 @@ const compressedFilePath = path.join(folderPath, 'instrument_data.csv.gz');
 const decompressedFilePath = path.join(folderPath, 'instrument_data.csv');
 const jsonFilePath = path.join(folderPath, 'instrument_data.json');
 const jsonFilePath2 = path.join(folderPath, 'instrument_keys_data.json');
+const jsonFilePath3 = path.join(folderPath, 'structured_data.json');
+
 
 
 axios({
@@ -54,11 +56,49 @@ axios({
     jsonArray=jsonArray.filter(i=>{
         if(i.instrument_type=="OPTIDX" && ["NIFTY","BANKNIFTY","FINNIFTY"].some(sub=>i.tradingsymbol.startsWith(sub))) return i
     })
+
+    const structuredData={
+      "BANKNIFTY": {},
+      "FINNIFTY": {},
+      "NIFTY": {}
+    }
+    jsonArray.map(i=>{
+      if(i.option_type==="CE"){
+        const s1=i.tradingsymbol.substring(0,i.tradingsymbol.length-2)
+        jsonArray.map(j=>{
+          if(j.option_type==="PE"){
+            const s2=j.tradingsymbol.substring(0,j.tradingsymbol.length-2)
+            if(s1===s2){
+              if(i.tradingsymbol.includes("BANKNIFTY")){
+                structuredData.BANKNIFTY[`${i.expiry} : ${i.strike}`]={
+                  CE:i,
+                  PE:j
+                }
+              }else if(i.tradingsymbol.includes("FINNIFTY")){
+                structuredData.FINNIFTY[`${i.expiry} : ${i.strike}`]={
+                  CE:i,
+                  PE:j
+                }
+            }else{
+              structuredData.NIFTY[`${i.expiry} : ${i.strike}`]={
+                CE:i,
+                PE:j
+              }
+          }
+          }
+        }
+      })
+      }
+    })
+    console.log(structuredData)
+    fs.writeFileSync(jsonFilePath3, JSON.stringify(structuredData, null, 2));
+
     const jsonArray2=jsonArray.map(i=>{
         return i.instrument_key
     })
     // Save JSON to file
     fs.writeFileSync(jsonFilePath2, JSON.stringify(jsonArray2, null, 2));
+
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(jsonArray, null, 2));
     console.log('File downloaded, decompressed, CSV converted to JSON, and saved successfully.');

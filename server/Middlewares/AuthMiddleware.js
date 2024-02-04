@@ -15,7 +15,11 @@ userVerification = (req, res, next) => {
       throw new ApiError(401, "Unauthorized Request", "Middleware/AuthMiddleware: userVerification");
     } else {
       const user = await User.findById(data.id)
-      if (user) next()
+      if (user) {
+        req.user=user
+        console.log("verified\n\n")
+        next()
+      }
       else throw new ApiError(500, "couldn't fetch user", "Middleware/AuthMiddleware: userVerification");
     }
   })

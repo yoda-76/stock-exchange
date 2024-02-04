@@ -1,4 +1,4 @@
-//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=test10@gmail.com
+//https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http://localhost:4000/auth&state=test12@gmail.com
 //https://api.upstox.com/v2/login/authorization/dialog?response_type=code&client_id=b643879d-2584-48ef-81c4-29fe850e4ded&redirect_uri=http%3A%2F%2Flocalhost:4000%2Fauth&state=test10@gmail.com
  
 
