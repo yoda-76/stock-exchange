@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from 'socket.io-client';
+import data from '../../../server/token_data/instrument_data.json'
 import Dropdown from "./basic components/Dropdown";
 import WatchList from "./watchList";
 import Orderbook from "./tradeDashboard/Orderbook";
@@ -24,8 +25,9 @@ import Toggle from "react-toggle";
 import "../App.css";
 const TradeDashboard = () => {
   const [errorMessage, setErrorMessage] = useState();
-  const [instrumentToken, setInstrumentToken] = useState();
-  const instrumentTokenRef = useRef(instrumentToken);
+  const [callInstrumentKey, setCallInstrumentKey] = useState();
+  const [putInstrumentKey, setPutInstrumentKey] = useState();
+  // const instrumentTokenRef = useRef(instrumentToken);
   const [ticksData, setTicksData] = useState();
   // const [tickData, setTickData] = useState();
   const [instrumentName, setInstrumentName] = useState("NIFTY");
@@ -34,11 +36,11 @@ const TradeDashboard = () => {
   const optionList = option.map((value) => ({ value, text: value }));
   const productList = products.map((value) => ({ value, text: value }));
   const [pnl, setPnl] = useState("0");
-  const [margin, setMargin] = useState();
-  const [selectedOption1, setSelectedOption1] = useState();
-  const [selectedOption2, setSelectedOption2] = useState();
-  const [atm, setAtm] = useState();
-  const [sellltp, setSellltp] = useState();
+  // const [margin, setMargin] = useState();
+  const [selectedInstrument, setSelectedInstrument] = useState();
+  // const [selectedOption2, setSelectedOption2] = useState();
+  // const [atm, setAtm] = useState();
+  // const [sellltp, setSellltp] = useState();
   const [expiryList, setExpiryList] = useState();
   const [strikeList, setStrikeList] = useState();
   const [expiry, setExpiry] = useState();
@@ -48,8 +50,8 @@ const TradeDashboard = () => {
   const [product, setProduct] = useState();
   const [positions, setPositions] = useState(false);
   const [funds, setFunds] = useState(false);
-  const [toggle, setToggle] = useState(false);
-  const [orderBook, setOrderBook] = useState(false);
+  // const [toggle, setToggle] = useState(false);
+  const [orderBookFlag, setOrderBookFlag] = useState(false);
   const [TradeBook, setTradeBook] = useState(false);
   const [customize, setCustomize] = useState(false);
   const [orderbook, setOrderbook] = useState();
@@ -71,17 +73,20 @@ const TradeDashboard = () => {
   const putSymbolRef = useRef(putSymbol);
   const [putLTP, setPutLTP] = useState();
   const [putToken, setPutToken] = useState();
-  const [bull, setBull] = useState(false);
   const [callToken, setCallToken] = useState();
-  const putTokenRef = useRef(putToken);
-  const callTokenRef = useRef(callToken);
+  const putTokenRef = useRef(putLTP);
+  const callTokenRef = useRef(callLTP);
   useEffect(() => {
     callSymbolRef.current = callSymbol;
     putSymbolRef.current = putSymbol;
     maindata.map((item) => {
+      // console.log(item.tradingsymbol,callSymbol,"item")
+      if(item.tradingsymbol.includes("FEB")){
+        console.log(item.tradingsymbol)
+      }
       if (String(item.tradingsymbol) === String(callSymbol)) {
         setCallToken(item.instrument_token);
-        console.log(item.instrument_token);
+        console.log(item.instrument_token,"token");
       }
       if (String(item.tradingsymbol) === String(putSymbol)) {
         setPutToken(item.instrument_token);
@@ -89,19 +94,20 @@ const TradeDashboard = () => {
     });
   }, [callSymbol, putSymbol]);
   useEffect(() => {
-    callTokenRef.current = callToken;
-    putTokenRef.current = putToken;
-    console.log(callSymbolRef.current);
-  }, [callToken, putToken]);
+    callTokenRef.current = callLTP;
+    putTokenRef.current = putLTP;
+    console.log(callLTP,"callLtp")
+    console.log(callTokenRef.current,"callTokenRef.current");
+  }, [callLTP, putLTP,callStrike,putStrike]);
   const Email =  window.localStorage.getItem("email");
   const orderbookRef = useRef(orderbook);
   const tradebookRef = useRef(tradebook);
   const fetchedPositionsRef = useRef(fetchedPositions);
   useEffect(() => {
-    orderbookRef.current = orderBook;
+    orderbookRef.current = orderBookFlag;
     tradebookRef.current = tradebook;
     fetchedPositionsRef.current = fetchedPositions;
-  }, [orderBook, tradebook, fetchedPositions]);
+  }, [orderBookFlag, tradebook, fetchedPositions]);
   const [customBuyCallKey, setCustomBuyCallKey] = useState(
     localStorage.getItem("customBuyCallKey") || ""
   );
@@ -140,19 +146,19 @@ const TradeDashboard = () => {
   useEffect(() => {
     stopLossTSLRef.current = stopLossTSL;
   }, [stopLossTSL]);
-  useEffect(() => {
-    instrumentTokenRef.current = instrumentToken;
-  }, [instrumentToken]);
+  // useEffect(() => {
+  //   instrumentTokenRef.current = instrumentToken;
+  // }, [instrumentToken]);
   useEffect(() => {
     for (let i = 0; i < maindata.length; i++) {
       const instrument = maindata[i];
-      if (String(instrument.name) === String(selectedOption1)) {
+      if (String(instrument.name) === String(selectedInstrument)) {
         setLotSize(instrument.lot_size);
-        console.log(selectedOption1, "hello");
+        console.log(selectedInstrument, "hello");
         break;
       }
     }
-  }, [selectedOption1]);
+  }, [selectedInstrument]);
 
   const [arrayOfTokens, setArrayOfToken] = useState([
     { token: 8963586, ltp: 0, pnl: 0, name: "BANKNIFTY" },
@@ -164,21 +170,6 @@ const TradeDashboard = () => {
     console.log(arrayOfTokens);
     console.log(newArray);
   };
-
-  const stopLossHandler = (token, stoploss) => {
-    setFetchedPositions((prev) => {
-      return {
-        ...prev,
-        day: fetchedPositions["day"].map((p) => {
-          if (String(token) === String(p.instrument_token)) {
-            return;
-          }
-        }),
-      };
-    });
-  };
-
- 
 
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
@@ -210,106 +201,77 @@ const TradeDashboard = () => {
   };
 
   const updatePositions = () => {
-    fetch(`${API_URL}/updatePositions`, {
+    fetch(`${API_URL}/console/get-funds `, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token: window.localStorage.getItem("token"),
+        email:Email,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.tradebook);
-        setOrderbook(data.orderbook);
-        setTradebook(data.tradebook);
-        setFetchedPositions(data.positions);
+        console.log(data,"positions");
       });
   };
 
 
   const handleClick = (selected) => {
     console.log("selected", selected);
-    setSelectedOption1(selected.name || selected);
-    console.log(selectedOption1);
+    setSelectedInstrument(selected.name || selected);
+    console.log(selectedInstrument);
+  
+    const filteredData = data.filter(item => 
+      item.tradingsymbol && 
+      (item.tradingsymbol.startsWith(`${selected}`) || item.tradingsymbol.includes(`_${selected}`))
+    );
+    console.log(filteredData,"filteredData");
+    console.log(data)
+  // const temp = data.map(item=>console.log(item.tradingsymbol))
+  // console.log(temp){ value, text: value }));
+  // const productList = products.map((value) => ({ value, text: value }));
+  const expiryList = [...new Set(filteredData.map(item => {if(item.last_price)return item.expiry}))].map(expiry => ({ value: expiry, text: expiry }));
+  console.log(expiryList,"expiryList");
+  setExpiryList(expiryList);
+  
+  // const strikeList = [...new Set(filteredData.map(item => item.strike))];
+  // const strikeList = [...new Set(filteredData.map(item => item.strike))].map(strike => ({ value: strike, text: strike }));
+  const strikeList = [...new Set(filteredData.map(item => {if(item.last_price)return item.strike}))]
+  .map(strike => ({
+    value: strike,
+    text: String(strike)
+  }));
 
-    fetch(`${API_URL}/instruments/getInstruments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: window.localStorage.getItem("token"),
-        selected,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        for (const instrument of data.instruments) {
-          if ((selected.name || selected) === instrument.name) {
-            console.log("This is my instrument token : ", instrumentToken);
-            setInstrumentToken(instrument.instrument_token);
-            break;
-          } else {
-            console.log("failed");
-          }
-        }
-
-        console.log(data.margins, "data 133");
-        console.log(data);
-        setMargin(data.margins);
-        setOrderbook(data.orderbook);
-        setTradebook(data.tradebook);
-        setFetchedPositions(data.positions);
-        setAtm(data.atm);
-        if (data.uniqueExpiryDates && data.uniqueExpiryDates.length > 0) {
-          console.log(data.uniqueExpiryDates);
-          setExpiryList(
-            data.uniqueExpiryDates
-              .map((value) => {
-                const dateObject = new Date(value.split("T")[0]); // Convert the date string to a Date object
-                const formattedDate = dateObject.toISOString().split("T")[0]; // Convert the Date object back to a formatted string
-                return { value: formattedDate, text: formattedDate };
-              })
-              .sort((a, b) => new Date(a.value) - new Date(b.value))
-          );
-          console.log(expiryList);
-          setExpiry(data.uniqueExpiryDates[0]);
-        } else {
-          setExpiryList([]);
-        }
-        if (data.uniqueStrikes && data.uniqueStrikes.length > 0) {
-          setStrikeList(
-            data.uniqueStrikes.map((value) => ({ value, text: value }))
-          );
-          setCallStrike(data.uniqueStrikes[0]);
-          setPutStrike(data.uniqueStrikes[0]);
-        } else {
-          setStrikeList([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  console.log(strikeList)
+  setStrikeList(strikeList);
+    
+    // const strikeList = filteredData.map(item => item.strike);
+    // setStrikeList(strikeList);
   };
+  
   useEffect(() => {
     handleClick("NIFTY");
+    updatePositions()
   }, []);
-
   useEffect(() => {
-    setCallSymbol(formater(selectedOption1 || "", callStrike, expiryList || [{}], expiry ? expiry : "", "CE"));
-    setPutSymbol(formater(selectedOption1 || "", putStrike, expiryList || [{}], expiry ? expiry : "", "PE"));
+console.log(strikeList)
+console.log(data)
+  }, [strikeList]);
+  useEffect(() => {
+console.log(selectedInstrument)
+console.log(callStrike)
+console.log(expiryList)
+console.log(expiry)
+console.log(putStrike)
+    setCallSymbol(formater(selectedInstrument || "", callStrike, expiryList || [{}], expiry ? expiry : "", "CE"));
+    setPutSymbol(formater(selectedInstrument || "", putStrike, expiryList || [{}], expiry ? expiry : "", "PE"));
     console.log(callSymbol);
     console.log(putSymbol);
-  }, [selectedOption1, callStrike, putStrike, expiry]);
-console.log(`${API_URL}?email=${Email}`)
+  }, [selectedInstrument, callStrike, putStrike, expiry]);
   useEffect(() => {
-console.log(`${API_URL}?email=${Email}`)
-
     const serverUrl =`${API_URL}?email=${Email}`;
     const socket = io(serverUrl);
-    // setSocket(ws);
     socket.on('connect',() => {
       console.log("WebSocket connected test");
       console.log("array of token", arrayOfTokens);
@@ -327,140 +289,58 @@ console.log(`${API_URL}?email=${Email}`)
       // console.log(ticks, "ticks");
       ticks.forEach((tick) => {
         // console.log(tick[1].ff.marketFF.ltpc.ltp)
+        // console.log(tick)
         const insToken = tick[0].split('|')[1]
-        // console.log(insToken)
-        if (insToken == "38936") {
-          console.log(tick);
+        // console.log(insToken,callStrike,"values")
+
+        if (tick[0] == "NSE_FO|35012") {
+          console.log(tick,"first tick");
         }
+        if (tick[0] == "NSE_FO|35013") {
+          console.log(tick,"second tick");
+        }
+        // if(string(tick)=== string())
+        // console.log(callStrike,data,"strike chec")
+        if(String(callStrike)===String(data.strike)){
+          console.log("found strike")
+        }
+        const expiryFilterdData = data.filter(item => item.expiry && item.expiry.includes(`${expiry}`));
+        const callInstrumentData = expiryFilterdData.filter(item => 
+          item.strike && item.strike.includes(`${callStrike}`) &&
+          item.tradingsymbol && item.tradingsymbol.includes(`CE`)
+        );
+        // console.log((callInstrumentData[0].instrument_key),tick,"callInstrumentData")
+        const putInstrumentData = expiryFilterdData.filter(item => 
+          item.strike && item.strike.includes(`${putStrike}`) &&
+          item.tradingsymbol && item.tradingsymbol.includes(`PE`)
+        );
+        // console.log(putInstrumentData,"putInstrumentData")
+        // console.log(instrumentData,"found instrument")
+        if (String(tick[0]) === String(callInstrumentData[0].instrument_key)) {
+          setCallLTP(tick[1].ff.marketFF.ltpc.ltp);
+          setCallInstrumentKey(tick[0])
+        }
+        if (String(tick[0]) === String(putInstrumentData[0] && putInstrumentData[0].instrument_key)) {
+          setPutLTP(tick[1].ff.marketFF.ltpc.ltp);
+          setPutInstrumentKey(tick[0])
+          console.log((tick[1].ff.marketFF.ltpc.ltp))
+        }
+        // if (String(insToken) === String(putTokenRef.current)) {
+        //   setPutLTP(tick[1].ff.marketFF.ltpc.ltp);
+        // }
       });
+      
       setArrayOfToken((prevArrayOfTokens) => {
         const watchList = [...prevArrayOfTokens];
         ticks.forEach((tick) => {
         const insToken = tick[0].split('|')[1]
-          fetchedPositionsRef.current &&
-            fetchedPositionsRef.current.day.map((p) => {
-              console.log(p)
-              const currentToken = instoken;
-              if (
-                Object.prototype.hasOwnProperty.call(
-                  trailingStopLossRef.current,
-                  Number(p.instrument_token)
-                ) &&
-                trailingStopLossRef.current[currentToken].status
-              ) {
-                if (
-                  String(p.instrument_token) === String(tick.instrument_token)
-                ) {
-                  console.log(stopLossTSLRef.current[currentToken]);
-                  if (stopLossTSLRef.current[currentToken] == undefined) {
-                    setStopLossTSL((prev) => {
-                      return { ...prev, [currentToken]: "0" };
-                    });
-                  }
-                  if (
-                    Number(stopLossTSLRef.current[currentToken]) +
-                      Number(trailingStopLossRef.current[currentToken].value) <
-                      String(tick.last_price) &&
-                    Number(trailingStopLossRef.current[currentToken].value) != 0
-                  ) {
-                    setStopLossTSL((prev) => {
-                      return {
-                        ...prev,
-                        [currentToken]: String(
-                          Number(tick.last_price) -
-                            Number(
-                              trailingStopLossRef.current[currentToken].value
-                            )
-                        ),
-                      };
-                    });
-                  }
-                }
-              }
+        // console.log(insToken)
+// console.log(tick,"tick")
+// console.log(insToken,callTokenRef.current,"tokens")
 
-              if (
-                Object.prototype.hasOwnProperty.call(
-                  stopLossTSLRef.current,
-                  Number(p.instrument_token)
-                ) &&
-                stopLossTSLRef.current[currentToken] != "0" &&
-                !trailingStopLossRef.current[currentToken].closed
-              ) {
-                if (
-                  String(p.instrument_token) === String(tick.instrument_token)
-                ) {
-                  if (p.quantity > 0) {
-                    if (
-                      Number(tick.last_price) <=
-                      Number(stopLossTSLRef.current[Number(p.instrument_token)])
-                    ) {
-                      console.log("exited- sold");
-                      console.log(
-                        stopLossTSLRef.current[Number(p.instrument_token)]
-                      );
-                      setStopLoss((prev) => {
-                        return { ...prev, [currentToken]: "0" };
-                      });
-                      setTrailingStopLoss((prev) => {
-                        return {
-                          ...prev,
-                          [currentToken]: {
-                            value: "0",
-                            status: false,
-                            closed: true,
-                          },
-                        };
-                      });
-                    }
-                  } else if (p.quantity < 0) {
-                    console.log("exited - buy");
-
-                    if (
-                      Number(tick.last_price) >=
-                      Number(stopLossTSLRef.current[Number(p.instrument_token)])
-                    ) {
-                      setStopLoss((prev) => {
-                        return { ...prev, [currentToken]: "0" };
-                      });
-                      setTrailingStopLoss((prev) => {
-                        return {
-                          ...prev,
-                          [currentToken]: { value: "0", status: false },
-                        };
-                      });
-                    }
-                  }
-                }
-              }
-            });
-          if (fetchedPositionsRef.current != undefined) {
-            setFetchedPositions((prev) => {
-              return {
-                ...prev,
-                day: prev.day.map((p) => {
-                  if (
-                    String(p.instrument_token) === String(tick.instrument_token)
-                  ) {
-                    return {
-                      ...p,
-                      last_price: tick.last_price,
-                      pnl: (tick.last_price - p.average_price) * p.quantity,
-                    };
-                  }
-                  return p;
-                }),
-              };
-            });
-          }
-
-          if (String(tick.instrument_token) === String(callTokenRef.current)) {
-            setCallLTP(tick.last_price);
-          }
-          if (String(tick.instrument_token) === String(putTokenRef.current)) {
-            setPutLTP(tick.last_price);
-          }
           watchList.forEach((item, index) => {
-            if (String(tick.instrument_token) === String(item.token)) {
+            console.log(item,"item")
+            if (String(insToken) === String(item.token)) {
               watchList[index].ltp = tick.last_price;
               watchList[index].pnl = (
                 ((tick.last_price - tick.ohlc.close) / tick.ohlc.close) *
@@ -510,7 +390,7 @@ console.log(`${API_URL}?email=${Email}`)
       console.log("useEffect has been deprecated");
       socket.close();
     };
-  }, []);
+  }, [callStrike,putStrike,selectedInstrument]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -577,7 +457,48 @@ console.log(`${API_URL}?email=${Email}`)
   const handleLotClick = () => {
     setSwitchQty(false);
   };
+  const handlePositionClick = () => {
+    setPositionButtonClicked(true);
+    setOrderBookButtonClicked(false);
+    setTradeBookButtonClicked(false);
+    setFundsButtonClicked(false);
+    setPositions(true);
+    setOrderBookFlag(false);
+    setTradeBook(false);
+    setFunds(false);
+  };
 
+  const handleOrderBookClick = () => {
+    setOrderBookButtonClicked(true);
+    setTradeBookButtonClicked(false);
+    setPositionButtonClicked(false);
+    setFundsButtonClicked(false);
+    setOrderBookFlag(true);
+    setTradeBook(false);
+    setPositions(false);
+    setFunds(false);
+  };
+
+  const handleTradeBookClick = () => {
+    setTradeBookButtonClicked(true);
+    setOrderBookButtonClicked(false);
+    setPositionButtonClicked(false);
+    setFundsButtonClicked(false);
+    setTradeBook(true);
+    setOrderBookFlag(false);
+    setPositions(false);
+    setFunds(false);
+  };
+  const handleFundsClick = () => {
+    setTradeBookButtonClicked(false);
+    setOrderBookButtonClicked(false);
+    setPositionButtonClicked(false);
+    setFundsButtonClicked(true);
+    setTradeBook(false);
+    setOrderBookFlag(false);
+    setPositions(false);
+    setFunds(true);
+  };
   useEffect(() => {
     window.addEventListener("beforeunload", refresh);
     return () => {
@@ -598,13 +519,20 @@ console.log(`${API_URL}?email=${Email}`)
       },
     });
   };
-  const handleToggle = () => {setToggle(!toggle);};
+  // const handleToggle = () => {setToggle(!toggle);};
   return (
     <div className="trade bg-[url('./assets/tradebg.jpg')] h-full w-full flex flex-col">
       <div className="h-24 w-full flex ">
         <div className="flex w-full justify-center">
           <div
-            onClick={() => (handleClick("FINNIFTY"), setInstrumentName("FINNIFTY"))}
+            // onClick={() => (handleClick("FINNIFTY"), setInstrumentName("FINNIFTY")),setCallLTP(0)}
+            onClick={() => {
+              handleClick("FINNIFTY");
+              setInstrumentName("FINNIFTY");
+              setCallLTP(0);
+              setPutLTP(0)
+            }}
+            
             className={`p-2 h-20 m-4 ${instrumentName == "FINNIFTY" ? "bg-[#37203E]" : "bg-[#1C1C1C]"} rounded-lg w-1/6 text-white`}>
             <div className="flex justify-around">
               <div className="flex">
@@ -618,21 +546,33 @@ console.log(`${API_URL}?email=${Email}`)
             </div>
           </div>
           <div
-            onClick={() => (handleClick("NIFTY"), setInstrumentName("NIFTY"))}
+            // onClick={() => (handleClick("NIFTY"), setInstrumentName("NIFTY")),setCallLTP(null)}
+            onClick={() => {
+              handleClick("NIFTY");
+              setInstrumentName("NIFTY");
+              setCallLTP(0);
+              setPutLTP(0)
+            }}
             className={`p-2 h-20 m-4 ${instrumentName == "NIFTY" ? "bg-[#37203E]" : "bg-[#1C1C1C]"} rounded-lg w-1/6 text-white`}>
             <div className="flex justify-around">
               <div className="flex">
                 <div className="w-6 h-6 rounded-full border border-[#1D3758] bg-[#1D3758] text-[#0070E4] flex justify-center items-center">N</div>
                 <h4 className="pl-2 font-medium text-lg">NIFTY</h4>
               </div>
-              <h3>{selectedOption2}</h3>
+              <h3>44989</h3>
             </div>
             <div className="pt-2 pl-8">
               <h3>4.5%</h3>
             </div>
           </div>
           <div
-            onClick={() => (handleClick("BANKNIFTY"), setInstrumentName("BANKNIFTY"))}
+            // onClick={() => (handleClick("BANKNIFTY"), setInstrumentName("BANKNIFTY")), setCallLTP(null)}
+            onClick={() => {
+              handleClick("BANKNIFTY");
+              setInstrumentName("BANKNIFTY");
+              setCallLTP(0);
+              setPutLTP(0)
+            }}
             className={`p-2 h-20 m-4 ${instrumentName == "BANKNIFTY" ? "bg-[#37203E]" : "bg-[#1C1C1C]"} rounded-lg w-1/6 text-white`}>
             <div className="flex justify-around">
               <div className="flex">
@@ -734,18 +674,20 @@ console.log(`${API_URL}?email=${Email}`)
                 <div className=" w-full flex justify-between px-4 pt-6">
                   <div>
                     <div className="font-medium text-lg text-white p-1">
-                      {callSymbol ? `Strike: ${callSymbol}` : "Strike : "}
+                      {callSymbol&&expiry&&callStrike ? `Strike: ${callSymbol}` : "Strike : "}
                     </div>
                     <div className="font-medium text-lg text-white p-1">
                       {callLTP ? `LTP : ${callLTP}` : "LTP : "}
+                      {/* {callLTP ? `LTP : ${callTokenRef.current}` : "LTP : "} */}
                     </div>
                   </div>
                   <div>
                     <div className="font-medium text-lg text-white p-1">
-                      {putSymbol ? `Strike : ${putSymbol}` : "Strike : "}
+                      {putSymbol&&expiry&&putStrike ? `Strike : ${putSymbol}` : "Strike : "}
                     </div>
                     <div className="font-medium text-lg text-white p-1">
                       {putLTP ? `LTP : ${putLTP}` : "LTP : "}
+                      {/* {putLTP ? `LTP : ${putTokenRef.current}` : "LTP : "} */}
                     </div>
                   </div>
                 </div>
@@ -786,7 +728,7 @@ console.log(`${API_URL}?email=${Email}`)
                     <div className="">
                       <button
                         className="new2 m-4 p-8 pt-2 pb-2  border border-green-400 text-green-400 rounded-lg font-semibold antialiased"
-                        onClick={() => {placeOrder("BUY", "CE",lotSize,callSymbol,qty,product,switchQty)}}>
+                        onClick={() => {placeOrder("BUY",lotSize,qty,callInstrumentKey)}}>
                         <div className="flex ">
                           <AiOutlineArrowLeft className=" mt-1.5 mr-2" /> Buy
                           call
@@ -796,7 +738,7 @@ console.log(`${API_URL}?email=${Email}`)
                     <div>
                         <button
                           className="new1 m-4 p-8 pt-2 pb-2 border border-red-400 text-red-400 rounded-lg font-semibold antialiased"
-                          onClick={() => {placeOrder("SELL", "CE",lotSize,callSymbol,qty,product,switchQty)}}>
+                          onClick={() => {placeOrder("SELL",lotSize,qty,callInstrumentKey)}}>
                           <div className="flex">
                             <AiOutlineArrowUp className="mt-1.5 mr-2" />
                             Sell call
@@ -804,7 +746,8 @@ console.log(`${API_URL}?email=${Email}`)
                         </button>
                     </div>
                   </div>
-                  <div className="pt-8 ">
+                  <div className="pt-2 ">
+                    <h2 className="text-white">Quantity</h2>
                       <input
                         type="number"
                         placeholder={`       Quantity`}
@@ -816,14 +759,14 @@ console.log(`${API_URL}?email=${Email}`)
                   <div className="flex justify-between w-1/3 mt-4 ">
                     <button
                       className=" new1 m-4 p-8 pt-2 pb-2  border border-green-500 text-green-400 rounded-lg font-semibold antialiased"
-                      onClick={() => {placeOrder("BUY", "PE",lotSize,callSymbol,qty,product,switchQty);}}>
+                      onClick={() => {placeOrder("BUY",lotSize,qty,putInstrumentKey);}}>
                       <div className="flex">
                         Buy Put <AiOutlineArrowDown className="mt-1.5 ml-2" />
                       </div>
                     </button>
                     <button
                       className="new1 m-4 p-8 pt-2 pb-2  border border-red-400 text-red-400 rounded-lg font-semibold antialiased"
-                      onClick={() => {placeOrder("SELL", "PE",lotSize,callSymbol,qty,product,switchQty)}}>
+                      onClick={() => {placeOrder("SELL",lotSize,qty,putInstrumentKey)}}>
                       <div className="flex">
                         Sell Put <AiOutlineArrowRight className="mt-1.5 ml-2" />
                       </div>
@@ -876,7 +819,7 @@ console.log(`${API_URL}?email=${Email}`)
                   </button>
                 </div>
 
-                {orderBook && <Orderbook orderbook={orderbook} />}
+                {orderBookFlag && <Orderbook orderbook={orderbook} />}
                 {TradeBook && <Tradebook tradebook={tradebook} />}
                 {positions && (
                   <Positions

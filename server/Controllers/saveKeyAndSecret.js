@@ -6,7 +6,7 @@ module.exports.saveKeyAndSecret = async (email, key, secret) => {
     if (user) {
       return user
     } else {
-      return
+        throw new ApiError(500,"couldn't save key and secret", ".Controllers/saveKeyAndSecret: saveKeyAndSecret")
     }
 };
 

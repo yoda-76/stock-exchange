@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import maindata from '../instrument.json';
+// import maindata from '../instrument.json';
+import mainData from '../../../server/token_data/instrument_data.json'
 import tradingsymbols from '../instrumentTradingSymbol.json';
 import instruments from '../instrument.json';
 import CustomCombobox from './basic components/AutoCompleteInput';
@@ -17,7 +18,12 @@ const WatchList = (props) => {
   const [name, setName] = useState();
   const [hoveredCEIndex, setHoveredCEIndex] = useState(null);
   const [hoveredPEIndex, setHoveredPEIndex] = useState(null);
-
+ const tradingSymbols = []
+  mainData.map((item, index) =>{
+    tradingSymbols.push({ name: item.tradingsymbol, id: index });
+  })
+  console.log(tradingSymbols,"trading symbol")
+  console.log(mainData,"trading symbol")
   console.log(props.ticksData);
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("watchlistData"));

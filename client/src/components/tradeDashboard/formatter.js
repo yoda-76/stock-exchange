@@ -1,8 +1,9 @@
-import React from 'react'
 
 const formater = (name, price, dateList, date, type) => {
         let formatedName;
         const trimedDate = date.split("T")[0];
+        console.log(date)
+        console.log(trimedDate)
         const trimedDateList = dateList.map((item) => item.value && item.value);
         trimedDateList.map((date, index) => {
           if (date == trimedDate) {

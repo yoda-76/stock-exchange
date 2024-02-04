@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
   },
   key:{type: String},
   secret:{type: String},
+  lastTokenGeneratedAt:String,
   funds: Object,
   watchlist: Object,
   orderbook: Object,
