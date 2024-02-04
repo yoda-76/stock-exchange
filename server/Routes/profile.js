@@ -6,7 +6,7 @@ const router = require('express').Router();
 // router.post('/', userVerification);
 router.post('/signup', async(req,res,next)=>{
   const {email, password, username, createdAt}=req.body
-  console.log("first")
+  // console.log("first")
 
   try{
     const token=await Signup(email, password, username, createdAt)

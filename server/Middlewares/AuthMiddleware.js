@@ -8,7 +8,7 @@ userVerification = (req, res, next) => {
   const token = req.cookies.token
   // console.log(token)
   if (!token) {
-    return res.json({ status: false })
+    return res.status(401).json({ status: "token missing from cookies" })
   }
   jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
     if (err) {
