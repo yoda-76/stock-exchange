@@ -31,8 +31,14 @@ mongoose
   
   app.use(cookieParser());
   app.use(express.json());
-  app.use(userVerification)
-  
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/profile/login') || req.path.startsWith('/profile/signup') || req.path.startsWith('/auth')) {
+      return next();
+    }
+    userVerification(req, res, next);
+  });  
+
+
 app.use("/", authRoute);
 app.use("/profile", profile);
 app.use("/console", tradingConsole);

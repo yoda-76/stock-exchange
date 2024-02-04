@@ -30,6 +30,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log(inputValue)
       const { data } = await axios.post(
         "http://localhost:4000/profile/login",
         {
