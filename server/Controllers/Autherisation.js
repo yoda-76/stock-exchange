@@ -12,6 +12,7 @@ module.exports.GetAccessToken = async (email,authcode) => {
   var currentdate = new Date(); 
   console.log(email,authcode)
   const user = await User.findOne({ email });
+  console.log(user)
   if(!user){
   return 
   }

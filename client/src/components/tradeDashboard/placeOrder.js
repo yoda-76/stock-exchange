@@ -1,22 +1,16 @@
 import React from 'react'
 import { API_URL } from '../../dynamicRoutes';
-const placeOrder = (orderType, callType,lotSize,callSymbol,qty,product,swithcQty) => {
+const placeOrder = (orderType,lotSize,qty,instrument_key) => {
         try {
-          fetch(`${API_URL}/placeOrder`, {
+          fetch(`${API_URL}/console/place-order`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              lotSize,
-              token: window.localStorage.getItem("token"),
-              symbol:
-                (callType == "CE" && callSymbol) || (callType == "PE" && putSymbol),
-              qty: qty,
+              quantity: qty*lotSize,
+              instrument_token: instrument_key,
               transaction_type: orderType,
-              product: product,
-              variety: "regular",
-              switchQty: swithcQty,
             }),
           })
             .then((res) => res.json())
