@@ -35,8 +35,32 @@ module.exports.Login = async (email, password) => {
 
       }
        const token = createSecretToken(user._id);
-       return token
+      //  console.log(user)
+       if(user.key && user.secret && user.lastTokenGeneratedAt){
+        data={keyAndSecretExist:false,isAccessTokenGenerated:false}
+        if(user.key && user.secret){
+          data.keyAndSecretExist=true
+        }
+        const parsedDate = new Date(user.lastTokenGeneratedAt.split(', ')[0]);
+        const today = new Date();
+        const todayDatePart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        if(parsedDate.getTime() === todayDatePart.getTime()){
+          data.isAccessTokenGenerated=true
+        }
+        return {token,data}
+      } return {token}
   }
+
+
+  module.exports.saveKeyAndSecret = async (user, key, secret) => {
+    const resp = await User.findOneAndUpdate({_id: user._id }, { $set: { key, secret } });
+    if (resp) {
+      return resp
+    } else {
+        throw new ApiError(500,"couldn't save key and secret", ".Controllers/saveKeyAndSecret: saveKeyAndSecret")
+    }
+  };
+
 
   module.exports.changePassword = async (req, res, next) => {
     try {

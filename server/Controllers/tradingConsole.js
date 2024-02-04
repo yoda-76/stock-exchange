@@ -1,41 +1,11 @@
 const axios = require('axios');
 const User = require("../Models/UserModel");
-
-module.exports.getBrokrage = async (email, instrumentToken, quantity, product, transactionType, price) => {
-
-
-    const user=await User.findOne({email})
-    const accessToken=user.data.access_token;
-    console.log("first", accessToken)
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: 'https://api.upstox.com/v2/charges/brokerage',
-      headers: { 
-        'Accept': 'application/json',
-        'Api-Version': '2.0',
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      params:{
-        "instrument_token":instrumentToken,
-        "price":price,
-        "transaction_type":transactionType,
-        "product":"I",
-        "quantity":quantity
-      }
-    };
-
-    const response=await axios(config)
-    // const brokerageData=response.data
-    // return brokerageData;
-};
+const ApiError=require("../util/api_error")
 
 
-    
-module.exports.getFunds = async (email) => {
-    
-  const user=await User.findOne({email})
+
+
+module.exports.getFunds = async (user) => {
   const accessToken=user.data.access_token
   console.log(user)
 
@@ -50,21 +20,12 @@ module.exports.getFunds = async (email) => {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
-
   const response=await axios(config)
-  const funds=response.data
-  console.log(JSON.stringify(funds))
-  return funds;
+  return response.data
 };
 
 
-
-
-
-
-module.exports.getPositions = async (email) => {
-  
-    const user=await User.findOne({email})
+module.exports.getPositions = async (user) => {
     const accessToken=user.data.access_token;
     let config = {
       method: 'get',
@@ -78,13 +39,11 @@ module.exports.getPositions = async (email) => {
       }
     };
     const response=await axios(config)
-    const positions=response.data
-    return positions;
-};
-
-
-module.exports.getOrderbook=async(email)=>{
-  const user=await User.findOne({email})
+    return response.data
+  };
+  
+  
+  module.exports.getOrderbook=async(user)=>{
   const accessToken=user.data.access_token;
   let config = {
     method: 'get',
@@ -97,31 +56,22 @@ module.exports.getOrderbook=async(email)=>{
     }
   };
   const response=await axios(config)
-  const positions=response.data
-  let orderbook=positions//...get orderbook from positions
-  return orderbook
+  return response.data
 }
 
-module.exports.getTradebook=async(email)=>{
-  const user=await User.findOne({email})
+module.exports.getTradebook=async(user)=>{
   const accessToken=user.data.access_token;
   const url = 'https://api.upstox.com/v2/order/trades/get-trades-for-day';
-const headers = {
-  'Accept': 'application/json',
-  'Authorization': `Bearer ${accessToken}`,
-} 
+  const headers = {
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${accessToken}`,
+  } 
   const response=await axios.get(url, { headers })
-  let tradebook=response.data
-  return tradebook
+  return response.data
 }
 
-module.exports.placeOrder = async (email, quantity, instrument_token, transaction_type) => {
-  console.log(email);
-
-  const user = await User.findOne({ email });
+module.exports.placeOrder = async (user, quantity, instrument_token, transaction_type) => {
   const accessToken = user.data.access_token;
-  console.log(accessToken);
-
   let config = {
     url: 'https://api.upstox.com/v2/order/place',
     method: 'post',  // Add the 'method' property and set it to 'post'
@@ -144,31 +94,42 @@ module.exports.placeOrder = async (email, quantity, instrument_token, transactio
       is_amo: true,
     }
   };
-
-  try {
     const response = await axios(config);
-    console.log('Response:', response.data);
     return response.data;
-  } catch (error) {
-    console.error('Error:', error.message);
-    return { success: false, message: `From placeOrder function: ${error.message}` };
-  }
-};
+  };
+  
+  
 
-
-
-module.exports.stoploss = async (email, quantity, instrument_token) => {
-  console.log(email);
-
-  const user = await User.findOne({ email });
-  const accessToken = user.data.access_token;
+  module.exports.stoploss = async (user, instrument_token) => {
+    const accessToken = user.data.access_token;
   console.log(accessToken);
-
-  //fetch quantity and transaction_type of the perticular token from positions
-
+  
+  let positionConfig = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: 'https://api.upstox.com/v2/portfolio/short-term-positions',
+    headers: { 
+      'Accept': 'application/json',
+      'Api-Version': '2.0',
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+  const response=await axios(positionConfig)
+  const positions=response.data
+  const {quantity, transaction_type}=position.map(p=>{
+    if(p.instrument_token===instrument_token){
+      if(p.transaction_type==="SELL"){
+        return {quantity: p.quantity, transaction_type:"BUY"}
+      }
+      return {quantity: p.quantity, transaction_type:"SELL"}
+      
+    }
+  })
+  
   let config = {
     url: 'https://api.upstox.com/v2/order/place',
-    method: 'post',  // Add the 'method' property and set it to 'post'
+    method: 'post',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -179,13 +140,13 @@ module.exports.stoploss = async (email, quantity, instrument_token) => {
       product: 'D',
       validity: 'DAY',
       price: 0,
-      tag: 'string', // You can include or remove this line based on your requirements
+      tag: 'string',
       instrument_token,
       order_type: 'MARKET',
       transaction_type,
       disclosed_quantity: 0,
       trigger_price: 0,
-      is_amo: true,
+      is_amo: false,
     }
   };
 
@@ -202,13 +163,12 @@ module.exports.stoploss = async (email, quantity, instrument_token) => {
 
 
 
-module.exports.cancelOrder = async (email,order_id) => {
-    const user=await User.findOne({email})
-    const accessToken=user.data.access_token;
-    let config = {
-      method: 'delete',
-      maxBodyLength: Infinity,
-      url: 'https://api.upstox.com/v2/order/cancel',
+module.exports.cancelOrder = async (user,order_id) => {
+  const accessToken=user.data.access_token;
+  let config = {
+    method: 'delete',
+    maxBodyLength: Infinity,
+    url: 'https://api.upstox.com/v2/order/cancel',
       headers: { 
         'Accept': 'application/json',
         'Api-Version': '2.0',
@@ -218,30 +178,29 @@ module.exports.cancelOrder = async (email,order_id) => {
         order_id
       }
     };
+    console.log(config)
     const response = await axios(config)
-    if(response)return response.data
-    return
-};
-
-
-module.exports.cancelAll = async (email) => {
-  const user=await User.findOne({email})
-  const accessToken=user.data.access_token;
-  let config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: 'https://api.upstox.com/v2/order/retrieve-all',
-    headers: { 
-      'Accept': 'application/json',
-      'Api-Version': '2.0',
-      'Authorization': `Bearer ${accessToken}`,
-    }
+    return response.data
   };
-  const response = await axios(config)
-  let canceledOrders=[]
-  for(const order of response.data.data){
-    if (order.status==="after market order req received"){
-      let config2 = {
+  
+
+  module.exports.cancelAll = async (user) => {
+    const accessToken=user.data.access_token;
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'https://api.upstox.com/v2/order/retrieve-all',
+      headers: { 
+        'Accept': 'application/json',
+        'Api-Version': '2.0',
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    };
+    const response = await axios(config)
+    let canceledOrders=[]
+    for(const order of response.data.data){
+      if (order.status==="after market order req received"){
+        let config2 = {
         method: 'delete',
         maxBodyLength: Infinity,
         url: 'https://api.upstox.com/v2/order/cancel',
@@ -255,13 +214,9 @@ module.exports.cancelAll = async (email) => {
         }
       };
       const response2 = await axios(config2)
-      console.log(response2.data.data.order_id)
       canceledOrders.push(response2.data.data.order_id)
     }
   }
-  // response.data.data.map((async order=>{
-    
-  // }))
   return canceledOrders
 };
 
@@ -282,13 +237,39 @@ module.exports.exitPosition = async (req, res, next) => {
 module.exports.exitAll = async (req, res, next) => {
   try {
     //fetch all positions and exit all of them 
-    } catch (error) {
+  } catch (error) {
     console.log("error =>>", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 
+// module.exports.getBrokrage = async (user, instrumentToken, quantity, product, transactionType, price) => {
+//     const accessToken=user.data.access_token;
+//     console.log("first", accessToken)
+//     let config = {
+//       method: 'get',
+//       maxBodyLength: Infinity,
+//       url: 'https://api.upstox.com/v2/charges/brokerage',
+//       headers: { 
+//         'Accept': 'application/json',
+//         'Api-Version': '2.0',
+//         'Authorization': `Bearer ${accessToken}`,
+//         'Content-Type': 'application/x-www-form-urlencoded'
+//       },
+//       params:{
+//         "instrument_token":instrumentToken,
+//         "price":price,
+//         "transaction_type":transactionType,
+//         "product":"I",
+//         "quantity":quantity
+//       }
+//     };
+
+//     const response=await axios(config)
+//     // const brokerageData=response.data
+//     // return brokerageData;
+// };
 
 
 

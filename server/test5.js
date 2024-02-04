@@ -5,6 +5,7 @@ const server = http.createServer(app); // Create an HTTP server
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const {userVerification}=require("./Middlewares/AuthMiddleware")
 const authRoute = require("./Routes/AuthRoute");
 const profile = require("./Routes/profile");
 const tradingConsole = require("./Routes/tradingConsole");
@@ -30,6 +31,7 @@ mongoose
   
   app.use(cookieParser());
   app.use(express.json());
+  app.use(userVerification)
   
 app.use("/", authRoute);
 app.use("/profile", profile);
@@ -53,6 +55,7 @@ const io = socketio(server, {
   },
 });
 const User = require("./Models/UserModel");
+// const { userVerification } = require("./Middlewares/AuthMiddleware");
 
 io.on('connection', async (socket) => {
   const user=await User.findOne({email:socket.handshake.query.email})

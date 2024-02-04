@@ -1,5 +1,5 @@
-const { Signup, Login, changePassword } = require('../Controllers/AuthController')
-const { saveKeyAndSecret } = require('../Controllers/saveKeyAndSecret');
+const { Signup, Login, changePassword, saveKeyAndSecret } = require('../Controllers/AuthController')
+// const {  } = require('../Controllers/saveKeyAndSecret');
 // const { userVerification } = require('../Middlewares/AuthMiddleware');
 const router = require('express').Router();
 
@@ -11,7 +11,7 @@ router.post('/signup', async(req,res,next)=>{
   try{
     const token=await Signup(email, password, username, createdAt)
     if(token){
-      console.log(token)
+      // console.log(token)
       res.cookie("token", token, {
       withCredentials: true,
       httpOnly: false,
@@ -31,18 +31,19 @@ router.post('/signup', async(req,res,next)=>{
 router.post('/login', async(req,res,next)=>{
   const {email, password}=req.body
   try{
-    const token=await Login(email, password)
+    const {token,data}=await Login(email, password)
+    console.log(data)
     if(token){
       console.log(token)
       res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: false,
+      httpOnly: true,
     });
     res
       .status(200)
-      .json({success:"ok", message: "User login successfully" });
+      .json({success:"ok", message: "User login successfully", data });
     }else{
-      return res.json({message:'Incorrect password or email' })
+      return res.status(500).json({message:'Incorrect password or email' })
     }
   }catch(err){
       console.log(err)
@@ -54,10 +55,11 @@ router.post('/login', async(req,res,next)=>{
 
 
 router.post("/saveKeyAndSecret", async(req,res,next)=>{
-  const {email, key, secret}=req.body
+  const {key, secret}=req.body
   try{
-    const user=await saveKeyAndSecret(email, key, secret)
-    if(user){
+    const user =req.user
+    const resp=await saveKeyAndSecret(user, key, secret)
+    if(resp){
       console.log(user)
     res
       .status(201)
