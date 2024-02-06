@@ -43,6 +43,8 @@ const Login = () => {
       if (success) {
         console.log(inputValue.email);
         window.localStorage.setItem("email",inputValue.email)
+        window.localStorage.setItem("token",data.token)
+
         handleSuccess(message);
         setTimeout(() => {
           navigate("/profile");

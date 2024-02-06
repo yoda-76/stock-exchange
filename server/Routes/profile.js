@@ -39,10 +39,11 @@ router.post('/login', async(req,res,next)=>{
       res.cookie("token", token, {
       withCredentials: true,
       httpOnly: true,
+      path: '/'
     });
     res
       .status(200)
-      .json({success:"ok", message: "User login successfully", data });
+      .json({success:"ok", message: "User login successfully",token, data });
     }else{
       return res.status(500).json({message:'Incorrect password or email' })
     }

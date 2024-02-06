@@ -205,6 +205,8 @@ const TradeDashboard = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "token":window.localStorage.getItem("token") ,
+        "credentials": 'include',
       },
       body: JSON.stringify({
         email:Email,
@@ -325,14 +327,15 @@ console.log(putStrike)
         const watchList = [...prevArrayOfTokens];
         ticks.forEach((tick) => {
         const insToken = tick[0].split('|')[1]
-        // console.log(insToken)
+        console.log(insToken)
 // console.log(tick,"tick")
 // console.log(insToken,callTokenRef.current,"tokens")
-
+console.log(watchList,"watchlist")
           watchList.forEach((item, index) => {
             // console.log(item,"item")
+            console.log(tick,item.token,"watchlist token check")
             if (String(tick) === String(item.token)) {
-              console.log(tick[1].ff.marketFF.ltpc.ltp)
+              console.log(tick[1].ff.marketFF.ltpc.ltp,"watchlist ticks")
               watchList[index].ltp = tick[1].ff.marketFF.ltpc.ltp;
               watchList[index].pnl = (
                 ((tick.last_price - tick.ohlc.close) / tick.ohlc.close) *

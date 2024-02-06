@@ -149,8 +149,8 @@ io.on('connection', async (socket) => {
       });
 
       ws.on("message", (data) => {
-        console.log(JSON.stringify(decodeProfobuf(data))); // Decode the protobuf message on receiving it
-        console.log("data")
+        // console.log(JSON.stringify(decodeProfobuf(data))); // Decode the protobuf message on receiving it
+        // console.log("data")
         io.emit('message',JSON.stringify(decodeProfobuf(data)))
       });
 
