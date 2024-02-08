@@ -36,7 +36,7 @@ const TradeDashboard = () => {
   const optionList = option.map((value) => ({ value, text: value }));
   const productList = products.map((value) => ({ value, text: value }));
   const [pnl, setPnl] = useState("0");
-  // const [margin, setMargin] = useState();
+  const [margin, setMargin] = useState();
   const [selectedInstrument, setSelectedInstrument] = useState();
   // const [selectedOption2, setSelectedOption2] = useState();
   // const [atm, setAtm] = useState();
@@ -201,7 +201,7 @@ const TradeDashboard = () => {
   };
 
   const updatePositions = () => {
-    fetch(`${API_URL}/console/get-funds `, {
+    fetch(`${API_URL}/console/get-orderbook `, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -215,6 +215,22 @@ const TradeDashboard = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data,"positions");
+        setOrderbook(data)
+      });
+    fetch(`${API_URL}/console/get-funds `, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "token":window.localStorage.getItem("token") ,
+        "credentials": 'include',
+      },
+      body: JSON.stringify({
+        email:Email,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setMargin(data)
       });
   };
 
@@ -309,10 +325,14 @@ console.log(putStrike)
         );
         // console.log(putInstrumentData,"putInstrumentData")
         // console.log(instrumentData,"found instrument")
-        if (String(tick[0]) === String(callInstrumentData[0].instrument_key)) {
-          setCallLTP(tick[1].ff.marketFF.ltpc.ltp);
-          setCallInstrumentKey(tick[0])
-        }
+if (
+  callInstrumentData.length > 0 &&
+  String(tick[0]) === String(callInstrumentData[0].instrument_key)
+) {
+  setCallLTP(tick[1].ff.marketFF.ltpc.ltp);
+  setCallInstrumentKey(tick[0]);
+}
+
         if (String(tick[0]) === String(putInstrumentData[0] && putInstrumentData[0].instrument_key)) {
           setPutLTP(tick[1].ff.marketFF.ltpc.ltp);
           setPutInstrumentKey(tick[0])
@@ -322,33 +342,35 @@ console.log(putStrike)
         //   setPutLTP(tick[1].ff.marketFF.ltpc.ltp);
         // }
       });
-      
       setArrayOfToken((prevArrayOfTokens) => {
         const watchList = [...prevArrayOfTokens];
+        console.log(watchList,"watchlist")
         ticks.forEach((tick) => {
-        const insToken = tick[0].split('|')[1]
-        console.log(insToken)
-// console.log(tick,"tick")
-// console.log(insToken,callTokenRef.current,"tokens")
-console.log(watchList,"watchlist")
           watchList.forEach((item, index) => {
-            // console.log(item,"item")
-            console.log(tick,item.token,"watchlist token check")
-            if (String(tick) === String(item.token)) {
-              console.log(tick[1].ff.marketFF.ltpc.ltp,"watchlist ticks")
+            if (String(tick[0]) === String(item.token)) {
               watchList[index].ltp = tick[1].ff.marketFF.ltpc.ltp;
               watchList[index].pnl = (
-                ((tick.last_price - tick.ohlc.close) / tick.ohlc.close) *
-                100
+                ((tick[1].last_price - tick[1].ohlc.close) / tick[1].ohlc.close) * 100
               ).toFixed(1);
             }
-            // if (String(tick.instrument_token) === String("8963842")) {
-            //   setSelectedOption2(tick.last_price);
-            //   setTickData(ticks);
-            //   console.log(tick.last_price, "tick");
-            // }
           });
-        });
+        });      
+    //   setArrayOfToken((prevArrayOfTokens) => {
+    //     const updatedWatchList = prevArrayOfTokens.map((item) => {
+    //       const matchingTick = ticks.find((tick) => String(tick[0]) === String(item.token));
+    // console.log(updatedWatchList,"up")
+    //       if (matchingTick) {
+    //         return {
+    //           ...item,
+    //           ltp: matchingTick[1].ff.marketFF.ltpc.ltp,
+    //           pnl: (
+    //             ((matchingTick[1].last_price - matchingTick[1].ohlc.close) / matchingTick[1].ohlc.close) * 100
+    //           ).toFixed(1),
+    //         };
+    //       }
+    
+    //       return item;
+    //     });
         setTicksData(ticks);
         ticks.map((tick) => {
           let buy = 0,

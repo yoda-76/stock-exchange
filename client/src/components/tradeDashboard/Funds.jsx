@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { API_URL } from '../../dynamicRoutes';
 
 const Funds = (props) => {
+  console.log(props.data.data.equity,"funds")
   return (
     // <div>{props.data&&props.data.equity.available.cash}</div>
     // console.log(props.data)
@@ -22,10 +23,13 @@ const Funds = (props) => {
         <tbody className=''>
           {props.data&&
                   <tr>
-                    <td className='text-center'>{props.data.equity.available.cash}</td>
-                    <td className='text-center'>{props.data.equity.available.live_balance}</td>
-                    <td className='text-center'>{props.data.equity.available.opening_balance}</td>
-                    <td className='text-center'>{props.data.equity.utilised.debits}</td>
+                    <td className='text-center'>{props.data.data.equity.available_margin}</td>
+                    <td className='text-center'>{props.data.data.equity.available_margin}</td>
+                    <td className='text-center'>{props.data.data.equity.available_margin}</td>
+                    <td className='text-center'>{props.data.data.equity.available_margin}</td>
+                    {/* // <td className='text-center'>{props.data.equity.available.live_balance}</td>
+                    // <td className='text-center'>{props.data.equity.available.opening_balance}</td>
+                    // <td className='text-center'>{props.data.equity.utilised.debits}</td> */}
                   </tr>
                   }
         </tbody>

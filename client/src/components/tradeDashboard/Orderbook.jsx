@@ -1,6 +1,27 @@
 import React from 'react'
-
+import { API_URL } from '../../dynamicRoutes';
+const Email= localStorage.getItem('email');
+const cancelOrder=(id)=>{
+  fetch(`${API_URL}/console/cancel-order `, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "token":window.localStorage.getItem("token") ,
+      "credentials": 'include',
+    },
+    body: JSON.stringify({
+      email:Email,
+      order_id:id,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+console.log(data,"canceled order")
+    });
+}
 const Orderbook = (props) => {
+  console.log(props.orderbook,"orderbook")
+ 
   return (
     <div className="flex flex-col gap-4 bg-transparent text-white w-full h-full">
     {/* header - nifty time  */}
@@ -21,12 +42,13 @@ const Orderbook = (props) => {
             <th className="font-normal">Transaction Type</th>
 
             <th className="font-normal">Status</th>
+            <th className="font-normal">Cancel</th>
             {/* <th className="font-normal">Sell</th> */}
           </tr>
         </thead>
         <tbody className="">
           {/* use map here  */}
-          {props.orderbook&&props.orderbook.map((item,index)=>{
+          {props.orderbook.data&&props.orderbook.data.map((item,index)=>{
             return (
               <tr  className="w-screen   p-4  border-b-2  border-gray-500 " >
                 <div className='flex items-center w-full h-12 border border-white justify-center m-8 p-4 bg-black rounded-xl'>
@@ -42,6 +64,11 @@ const Orderbook = (props) => {
               <div className='border p-4 border-green-300  rounded-lg w-fit pr-8'>
               <td className='mr-8 p'>{item.status}</td>
               </div>
+              <td className='mr-8 p'>
+              {item.status != "cancelled after market order" ? (
+        <button className='pl-10' onClick={() => cancelOrder(item.order_id)}>Cancel Order</button>
+      ) : null}
+              </td>
             </tr>        
             )
           })}

@@ -146,7 +146,7 @@ module.exports.placeOrder = async (user, quantity, instrument_token, transaction
       transaction_type,
       disclosed_quantity: 0,
       trigger_price: 0,
-      is_amo: false,
+      is_amo: true,
     }
   };
 

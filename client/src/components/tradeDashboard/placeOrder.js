@@ -3,6 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from '../../dynamicRoutes';
 const placeOrder = (orderType,lotSize,qty,instrument_key) => {
+  console.log(qty*lotSize,instrument_key,orderType,"placeorder")
         try {
           fetch(`${API_URL}/console/place-order`, {
             method: "POST",
