@@ -508,6 +508,7 @@ console.log(watchList,"watchlist")
   }, [TotalStopLossFlag]);
   const refresh = (e) => {
     fetch(`${API_URL}/test`, {
+      "token":window.localStorage.getItem("token"),
       method: "GET",
       headers: {
         "Content-Type": "application/json",

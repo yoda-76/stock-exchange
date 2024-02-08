@@ -4,6 +4,7 @@ const exitAll = () => {
         fetch(`${API_URL}/exitAll`, {
           method: "POST",
           headers: {
+            "token":window.localStorage.getItem("token"),
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

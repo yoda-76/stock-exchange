@@ -2,6 +2,7 @@ const updatePositions = () => {
     fetch(`${API_URL}/console/get-positions `, {
       method: "POST",
       headers: {
+        "token":window.localStorage.getItem("token"),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

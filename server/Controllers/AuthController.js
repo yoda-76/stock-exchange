@@ -37,7 +37,7 @@ module.exports.Login = async (email, password) => {
        const token = createSecretToken(user._id);
       //  console.log(user)
        if(user.key && user.secret && user.lastTokenGeneratedAt){
-        data={keyAndSecretExist:false,isAccessTokenGenerated:false}
+        data={keyAndSecretExist:false,isAccessTokenGenerated:false, key:""}
         if(user.key && user.secret){
           data.keyAndSecretExist=true
         }
@@ -47,6 +47,7 @@ module.exports.Login = async (email, password) => {
         if(parsedDate.getTime() === todayDatePart.getTime()){
           data.isAccessTokenGenerated=true
         }
+        data.key=user.key
         return {token,data}
       } return {token}
   }

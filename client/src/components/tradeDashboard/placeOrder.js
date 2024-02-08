@@ -7,6 +7,7 @@ const placeOrder = (orderType,lotSize,qty,instrument_key) => {
           fetch(`${API_URL}/console/place-order`, {
             method: "POST",
             headers: {
+              "token":window.localStorage.getItem("token"),
               "Content-Type": "application/json",
             },
             body: JSON.stringify({

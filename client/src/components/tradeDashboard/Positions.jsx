@@ -20,6 +20,7 @@ const Positions = (props) => {
       fetch(`${API_URL}/exit`, {
         method: 'POST',
         headers: {
+          "token":window.localStorage.getItem("token"),
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

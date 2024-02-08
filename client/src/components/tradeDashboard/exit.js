@@ -6,6 +6,7 @@ const exit = (symbol) => {
           fetch(`${API_URL}/exit`, {
             method: "POST",
             headers: {
+              "token":window.localStorage.getItem("token"),
               "Content-Type": "application/json",
             },
             body: JSON.stringify({

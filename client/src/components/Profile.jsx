@@ -22,6 +22,7 @@ const Profile = () => {
       method: "POST",
       crossDomain: true,
       headers: {
+        "token":window.localStorage.getItem("token"),
         "Content-Type": "application/json",
         Accept: "application/json",
         "Access-Control-Allow-Origin": "*",
