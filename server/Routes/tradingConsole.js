@@ -115,8 +115,32 @@ router.post("/stoploss",async(req,res,next)=>{
         res.status(500).json(err)
     }
 })
-router.post("/exit-position",exitPosition)
-router.post("/exit-all",exitAll)
+router.post("/exit-position",async(req,res,next)=>{
+    const user=req.user
+    const instrument_token=req.body
+    try{
+        res.status(200).json(
+            await exitAll(user, instrument_token)
+            )
+    }catch(err){
+        console.log(err)
+        res.status(500).json(err)
+    }
+})
+
+
+
+router.post("/exit-all",async(req,res,next)=>{
+    const user=req.user
+    try{
+        res.status(200).json(
+            await exitAll(user)
+            )
+    }catch(err){
+        console.log(err)
+        res.status(500).json(err)
+    }
+})
 
 //also add get profile method
 
